@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Callbacks no jQuery — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Callbacks no jQuery</h1>
+    <p class="subtitle">
+      O que é callback e como usar <code>success</code>, <code>error</code> e
+      <code>complete</code> nas requisições AJAX do jQuery.
+    </p>
+
+    <section>
+      <h2>O que é callback?</h2>
+      <p>
+        <strong>Callback</strong> é uma função passada como argumento para ser executada
+        <em>depois</em> de um evento — no caso do AJAX, quando a requisição termina
+        (com sucesso ou com falha). Como a requisição é <strong>assíncrona</strong>, você
+        não pode fazer <code>const dados = $.get(...)</code> e usar na linha seguinte;
+        você registra o que fazer <strong>quando a resposta chegar</strong>.
+      </p>
+<pre><code>// A requisição dispara e o script continua...
+$.getJSON("/livros/1", function (livro) {
+  // ← este callback roda só quando (e se) der certo
+  console.log(livro.titulo);
+});
+console.log("Isso aparece antes da resposta");</code></pre>
+    </section>
+
+    <section>
+      <h2>Callbacks no <code>$.ajax</code></h2>
+      <p>
+        O <code>$.ajax</code> aceita três callbacks principais no objeto de opções:
+      </p>
+      <ul>
+        <li><code>success</code> — HTTP OK e resposta parseada com sucesso</li>
+        <li><code>error</code> — falha HTTP, parse ou rede</li>
+        <li><code>complete</code> — sempre no final, com sucesso ou erro</li>
+      </ul>
+<pre><code>$.ajax({
+  url: "https://api.exemplo.com/livros/1",
+  method: "GET",
+  dataType: "json",
+
+  success: function (dados, textStatus, xhr) {
+    console.log("Sucesso:", dados);
+  },
+
+  error: function (xhr, textStatus, errorThrown) {
+    console.error("Falhou:", xhr.status, textStatus, errorThrown);
+  },
+
+  complete: function (xhr, textStatus) {
+    console.log("Terminou (loading off)");
+  }
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>Parâmetros do <code>error</code></h2>
+      <p>
+        O callback de erro recebe três argumentos — úteis para debug:
+      </p>
+      <ul>
+        <li><code>xhr</code> — objeto da requisição (status HTTP, headers, <code>responseText</code>)</li>
+        <li><code>textStatus</code> — string como <code>"error"</code>, <code>"timeout"</code>, <code>"parsererror"</code></li>
+        <li><code>errorThrown</code> — mensagem de exceção ou status textual</li>
+      </ul>
+      <div class="card">
+        <strong>Quando cada um dispara:</strong>
+        <code>success</code> → status 2xx e corpo compatível com <code>dataType</code>.
+        <code>error</code> → 4xx/5xx, JSON inválido com <code>dataType: "json"</code>,
+        timeout ou falha de rede/CORS.
+      </div>
+    </section>
+
+    <section>
+      <h2>Callbacks em <code>$.get</code> e <code>$.post</code></h2>
+      <p>
+        Nos atalhos, o callback de sucesso vai como argumento — não há
+        <code>error</code> embutido na assinatura simples:
+      </p>
+<pre><code>// 3º argumento = success
+$.get("/livros", { pagina: 1 }, function (lista) {
+  console.log(lista);
+}, "json");
+
+$.post("/livros", { titulo: "1984" }, function (resposta) {
+  console.log(resposta);
+}, "json");</code></pre>
+      <p>
+        Para tratar erro com atalhos, encadeie <code>.fail()</code> ou use
+        <code>$.ajax</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2><code>.done()</code>, <code>.fail()</code> e <code>.always()</code></h2>
+      <p>
+        <code>$.ajax</code>, <code>$.get</code> e <code>$.getJSON</code> retornam um objeto
+        <strong>jqXHR</strong> (parecido com Promise). Você pode encadear callbacks:
+      </p>
+<pre><code>$.getJSON("https://api.exemplo.com/livros/1")
+  .done(function (livro) {
+    console.log("OK:", livro);
+  })
+  .fail(function (xhr, status, erro) {
+    console.error("Erro:", status, erro);
+  })
+  .always(function () {
+    console.log("Sempre executa no fim");
+  });</code></pre>
+      <ul>
+        <li><code>.done()</code> ≈ <code>success</code></li>
+        <li><code>.fail()</code> ≈ <code>error</code></li>
+        <li><code>.always()</code> ≈ <code>complete</code></li>
+      </ul>
+      <p>
+        Use o estilo de objeto (<code>success</code>/<code>error</code>) ou o encadeado
+        (<code>.done</code>/<code>.fail</code>) — não misture os dois no mesmo fluxo
+        para não duplicar lógica.
+      </p>
+    </section>
+
+    <section>
+      <h2><code>complete</code> / <code>.always()</code> — para quê?</h2>
+      <p>
+        Ideal para ações que devem rodar <strong>independente do resultado</strong>:
+        esconder spinner, reabilitar botão, fechar modal de loading.
+      </p>
+<pre><code>$("#btn-buscar").prop("disabled", true);
+
+$.getJSON("/livros")
+  .done(function (lista) { renderizar(lista); })
+  .fail(function () { mostrarErro("Não foi possível carregar"); })
+  .always(function () {
+    $("#btn-buscar").prop("disabled", false);
+  });</code></pre>
+    </section>
+
+    <section>
+      <h2>Callback vs código síncrono</h2>
+      <p>
+        Erro comum: usar o resultado fora do callback.
+      </p>
+<pre><code>let livro;
+
+$.getJSON("/livros/1", function (d) {
+  livro = d;
+});
+
+console.log(livro); // undefined — ainda não chegou!</code></pre>
+      <p>
+        Toda lógica que depende da resposta deve ficar <strong>dentro</strong> do
+        <code>success</code>, <code>.done()</code> ou em uma função chamada <strong>por</strong> eles.
+      </p>
+
+      <h3>Dentro do callback ou em função chamada por ele?</h3>
+      <p>
+        Você não precisa escrever tudo inline no <code>.done()</code>. Pode extrair para
+        outra função — o importante é <strong>quando</strong> ela roda: só depois que os
+        dados existem.
+      </p>
+<pre><code>function renderizarLivro(livro) {
+  document.getElementById("titulo").textContent = livro.titulo;
+}
+
+$.getJSON("/livros/1", function (livro) {
+  renderizarLivro(livro); // ✅ chamada depois que livro existe
+});
+
+renderizarLivro(livro);   // ❌ livro ainda não existe aqui</code></pre>
+
+      <h3>Passar callback como parâmetro — <code>buscarLivro</code></h3>
+      <p>
+        Às vezes você encapsula a requisição e deixa quem chamou decidir o que fazer
+        com o resultado. O 2º argumento (<code>aoSucesso</code>) é uma <strong>função</strong>
+        que será executada quando a API responder.
+      </p>
+<pre><code>function buscarLivro(id, aoSucesso) {
+  $.getJSON("/livros/" + id, function (livro) {
+    aoSucesso(livro); // repassa o livro para quem pediu
+  });
+}
+
+buscarLivro(1, function (livro) {
+  preencherFormulario(livro);
+  salvarNoCache(livro);
+});</code></pre>
+      <p><strong>Linha a linha:</strong></p>
+      <ol>
+        <li><code>buscarLivro(1, function...)</code> — você pede o livro 1 e entrega uma função dizendo o que fazer depois.</li>
+        <li><code>$.getJSON</code> — dispara a requisição; o script não trava.</li>
+        <li>Quando a API responde, o jQuery chama <code>function (livro) { ... }</code> de dentro de <code>buscarLivro</code>.</li>
+        <li><code>aoSucesso(livro)</code> — executa a função que você passou (<code>preencherFormulario</code>, <code>salvarNoCache</code>, etc.).</li>
+      </ol>
+      <div class="card">
+        <strong>Ordem no tempo:</strong> primeiro registra o pedido → depois a API responde →
+        só então roda <code>preencherFormulario</code> e <code>salvarNoCache</code> com dados reais.
+        A função anônima que você passou em <code>buscarLivro(1, function...)</code>
+        <em>é</em> o <code>aoSucesso</code> de dentro da função.
+      </div>
+      <p><strong>Por que usar esse padrão?</strong> A parte “buscar na API” fica em um só lugar;
+        cada tela pode passar um <code>aoSucesso</code> diferente:</p>
+<pre><code>// Tela A — só preenche formulário
+buscarLivro(1, function (livro) {
+  preencherFormulario(livro);
+});
+
+// Tela B — só salva no cache
+buscarLivro(1, function (livro) {
+  salvarNoCache(livro);
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>Experimente no navegador</h2>
+      <p>Teste sucesso e erro simulado com a JSONPlaceholder:</p>
+      <button type="button" id="btn-ok">Simular success (.done)</button>
+      <button type="button" id="btn-erro">Simular error (.fail)</button>
+      <pre id="saida-console" aria-live="polite">Clique em um dos botões.</pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li><strong>Callback</strong> — função chamada quando a requisição assíncrona termina.</li>
+        <li><code>success</code> / <code>.done()</code> — resposta OK e parseada.</li>
+        <li><code>error</code> / <code>.fail()</code> — HTTP, parse, rede ou timeout.</li>
+        <li><code>complete</code> / <code>.always()</code> — limpeza final, ganhe ou perca.</li>
+        <li>Próximo passo: <a href="fetch-api.html">Fetch API</a> e depois <a href="promises-xhr.html">Promises</a>.</li>
+      </ul>
+    </section>
+
+    <footer>PDI Front — Callbacks no jQuery</footer>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script>
+    const saida = document.getElementById("saida-console");
+
+    function desabilitarBotoes(desabilitar) {
+      document.getElementById("btn-ok").disabled = desabilitar;
+      document.getElementById("btn-erro").disabled = desabilitar;
+    }
+
+    document.getElementById("btn-ok").addEventListener("click", function () {
+      if (typeof $ === "undefined") {
+        saida.textContent = "jQuery não carregou.";
+        return;
+      }
+
+      desabilitarBotoes(true);
+      saida.textContent = "Requisitando...";
+
+      $.getJSON("https://jsonplaceholder.typicode.com/posts/1")
+        .done(function (post, textStatus, xhr) {
+          saida.textContent =
+            ".done() — success\n" +
+            "textStatus: " + textStatus + "\n" +
+            "HTTP: " + xhr.status + "\n\n" +
+            "Título: " + post.title;
+        })
+        .fail(function (xhr, status, erro) {
+          saida.textContent = ".fail() — " + status + " — " + erro;
+        })
+        .always(function () {
+          desabilitarBotoes(false);
+        });
+    });
+
+    document.getElementById("btn-erro").addEventListener("click", function () {
+      if (typeof $ === "undefined") {
+        saida.textContent = "jQuery não carregou.";
+        return;
+      }
+
+      desabilitarBotoes(true);
+      saida.textContent = "Requisitando URL inválida...";
+
+      $.getJSON("https://jsonplaceholder.typicode.com/rota-inexistente-404")
+        .done(function (post) {
+          saida.textContent = "Sucesso: " + post;
+        })
+        .fail(function (xhr, status, erro) {
+          saida.textContent =
+            ".fail() — error\n" +
+            "HTTP: " + xhr.status + "\n" +
+            "textStatus: " + status + "\n" +
+            "errorThrown: " + erro;
+        })
+        .always(function () {
+          desabilitarBotoes(false);
+        });
+    });
+  </script>
+</body>
+</html>

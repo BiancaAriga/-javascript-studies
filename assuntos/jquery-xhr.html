@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jQuery e abstração do XHR — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>jQuery e abstração do XHR</h1>
+    <p class="subtitle">
+      Como o jQuery simplificou requisições HTTP em cima do XMLHttpRequest com
+      <code>$.ajax</code>, <code>$.get</code> e <code>$.post</code>.
+    </p>
+
+    <section>
+      <h2>Por que o jQuery entrou em cena?</h2>
+      <p>
+        No início dos anos 2000, fazer AJAX com <strong>XHR puro</strong> era verboso:
+        criar o objeto, configurar <code>open</code> e <code>send</code>, tratar
+        <code>readyState</code>, parsear JSON manualmente e lidar com diferenças entre
+        navegadores. O <strong>jQuery</strong> (lançado em 2006) unificou isso em poucas
+        linhas e popularizou o padrão <em>“buscar dados sem recarregar a página”</em>.
+      </p>
+      <div class="card">
+        <strong>Ideia central:</strong> por baixo dos panos, <code>$.ajax</code> ainda usa
+        <code>XMLHttpRequest</code> (ou alternativas do navegador). O jQuery é uma
+        <strong>camada de abstração</strong> — você declara o que quer; a biblioteca
+        cuida dos detalhes repetitivos.
+      </div>
+    </section>
+
+    <section>
+      <h2>XHR puro vs jQuery (mesmo GET)</h2>
+      <h3>Com XMLHttpRequest</h3>
+<pre><code>const xhr = new XMLHttpRequest();
+xhr.open("GET", "https://api.exemplo.com/livros/1", true);
+
+xhr.onload = function () {
+  if (xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) {
+    const livro = JSON.parse(xhr.responseText);
+    console.log(livro);
+  }
+};
+
+xhr.onerror = function () {
+  console.error("Erro na requisição");
+};
+
+xhr.send();</code></pre>
+
+      <h3>Com jQuery — <code>$.ajax</code></h3>
+<pre><code>$.ajax({
+  url: "https://api.exemplo.com/livros/1",
+  method: "GET",
+  dataType: "json",
+  success: function (livro) {
+    console.log(livro);
+  },
+  error: function (xhr, status, erro) {
+    console.error("Erro:", status, erro);
+  }
+});</code></pre>
+      <p>
+        Com <code>dataType: "json"</code>, o jQuery já entrega o objeto parseado em
+        <code>success</code> — não é preciso chamar <code>JSON.parse</code> no
+        <code>responseText</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2><code>$.ajax</code> — método completo</h2>
+      <p>
+        É a função mais flexível: aceita qualquer verbo HTTP, headers, corpo,
+        timeouts e callbacks. Use quando precisar de controle total.
+      </p>
+<pre><code>$.ajax({
+  url: "https://api.exemplo.com/livros",
+  method: "POST",
+  contentType: "application/json",
+  data: JSON.stringify({ titulo: "Dom Casmurro", autor: "Machado" }),
+  dataType: "json",
+  success: function (resposta) {
+    console.log("Criado:", resposta);
+  },
+  error: function (xhr, status, errorThrown) {
+    console.log("Status HTTP:", xhr.status);
+    console.log("Detalhe:", errorThrown);
+  }
+});</code></pre>
+      <p>Opções úteis no dia a dia:</p>
+      <ul>
+        <li><code>url</code> — endereço da API</li>
+        <li><code>method</code> ou <code>type</code> — GET, POST, PUT, DELETE…</li>
+        <li><code>data</code> — query string (GET) ou corpo (POST)</li>
+        <li><code>contentType</code> — formato do que você <strong>envia</strong> no corpo (ex.: <code>application/json</code>)</li>
+        <li><code>dataType</code> — formato que você <strong>espera receber</strong>: <code>"json"</code>, <code>"text"</code>, <code>"html"</code></li>
+        <li><code>headers</code> — objeto com cabeçalhos extras (ex.: Authorization)</li>
+        <li><code>beforeSend</code> — hook antes de enviar (loading, token)</li>
+      </ul>
+
+      <h3><code>contentType</code> vs <code>dataType</code></h3>
+      <p>
+        A diferença está no <strong>sentido</strong> da informação: um diz o que você manda;
+        o outro, o que você espera de volta.
+      </p>
+      <ul>
+        <li>
+          <strong><code>contentType</code></strong> — cabeçalho HTTP <code>Content-Type</code> da
+          <em>requisição</em>. Informa ao servidor como ler o corpo que você enviou.
+          Usado sobretudo em POST, PUT e PATCH.
+        </li>
+        <li>
+          <strong><code>dataType</code></strong> — opção do jQuery para a <em>resposta</em>.
+          Diz como a biblioteca deve tratar o corpo antes de chamar <code>success</code>
+          (por exemplo, fazer parse de JSON).
+        </li>
+      </ul>
+
+      <div class="card">
+        <strong>Resumo:</strong>
+        <code>contentType</code> = etiqueta da caixa que você <strong>despacha</strong>;
+        <code>dataType</code> = formato da caixa que você <strong>espera receber</strong>.
+        No XHR puro ou no <code>fetch</code>, você define <code>Content-Type</code> no header
+        ao enviar e usa <code>JSON.parse</code> ou <code>response.json()</code> ao receber.
+      </div>
+
+<pre><code>$.ajax({
+  url: "/livros",
+  method: "POST",
+  contentType: "application/json",  // o que EU envio
+  data: JSON.stringify({ titulo: "Dom Casmurro" }),
+  dataType: "json",                 // o que EU espero receber
+  success: function (livroCriado) {
+    console.log(livroCriado.id);    // já é objeto
+  }
+});</code></pre>
+    </section>
+
+    <section>
+      <h2><code>$.get</code> — atalho para GET</h2>
+      <p>
+        Quando você só precisa buscar dados, <code>$.get</code> encurta o
+        <code>$.ajax</code>:
+      </p>
+<pre><code>// Assinatura: $.get(url, data, success, dataType)
+
+$.get("https://api.exemplo.com/livros", { pagina: 1 }, function (lista) {
+  console.log(lista);
+}, "json");</code></pre>
+      <p>Equivalente resumido:</p>
+<pre><code>$.get("https://api.exemplo.com/livros/1", function (livro) {
+  console.log(livro.titulo);
+});</code></pre>
+      <p>
+        O jQuery monta a query string a partir do objeto <code>data</code> e trata a
+        resposta conforme o <code>dataType</code> informado.
+      </p>
+    </section>
+
+    <section>
+      <h2><code>$.post</code> — atalho para POST</h2>
+      <p>
+        Para enviar dados ao servidor (criar recurso, formulário, etc.):
+      </p>
+<pre><code>$.post(
+  "https://api.exemplo.com/livros",
+  { titulo: "1984", autor: "Orwell" },
+  function (resposta) {
+    console.log("Salvo:", resposta);
+  },
+  "json"
+);</code></pre>
+      <p>
+        Por padrão, <code>$.post</code> envia como
+        <code>application/x-www-form-urlencoded</code>. Para JSON puro, prefira
+        <code>$.ajax</code> com <code>contentType: "application/json"</code> e
+        <code>data: JSON.stringify(...)</code>.
+      </p>
+      <div class="card">
+        <strong><code>application/x-www-form-urlencoded</code> em resumo:</strong>
+        formato de formulário HTML — os campos viram uma string
+        <code>chave=valor&amp;chave2=valor2</code> no corpo do POST (espaços viram
+        <code>+</code>, caracteres especiais são codificados). É o mesmo padrão de um
+        <code>&lt;form method="POST"&gt;</code> tradicional. Bom para campos simples;
+        APIs REST modernas costumam esperar <code>application/json</code>.
+      </div>
+<pre><code>// $.post com o exemplo acima envia no corpo:
+// titulo=1984&amp;autor=Orwell</code></pre>
+    </section>
+
+    <section>
+      <h2><code>$.getJSON</code></h2>
+      <p>
+        Atalho ainda mais específico: GET esperando JSON. Muito usado em tutoriais e APIs públicas.
+      </p>
+<pre><code>$.getJSON("https://api.exemplo.com/livros/1", function (livro) {
+  console.log(livro);
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>O que o jQuery melhorou em relação ao XHR?</h2>
+      <ul>
+        <li><strong>Menos código boilerplate</strong> — sem gerenciar <code>readyState</code> manualmente</li>
+        <li><strong>JSON automático</strong> — com <code>dataType: "json"</code> ou <code>$.getJSON</code></li>
+        <li><strong>Callbacks padronizados</strong> — <code>success</code> e <code>error</code> em um só lugar</li>
+        <li><strong>Serialização de <code>data</code></strong> — objetos viram query string ou corpo POST</li>
+        <li><strong>Compatibilidade histórica</strong> — mesma API em navegadores antigos</li>
+      </ul>
+      <div class="card">
+        <strong>Hoje:</strong> projetos novos costumam usar <code>fetch</code> ou <code>axios</code>
+        sem adicionar jQuery só por AJAX. Mesmo assim, entender <code>$.ajax</code> ajuda a ler
+        código legado e a ver a evolução: XHR → jQuery → Fetch/Promises.
+      </div>
+    </section>
+
+    <section>
+      <h2>Ligando com seu PDI (lista de livros)</h2>
+      <p>
+        Na <strong>Etapa 2</strong> da aplicação prática, você vai pegar o app que hoje usa XHR
+        e trocar a chamada pela Faker API usando jQuery. Compare:
+      </p>
+      <ul>
+        <li>Quantas linhas sumiram?</li>
+        <li>Onde o tratamento de erro ficou mais claro?</li>
+        <li>O parse de JSON ainda é manual?</li>
+      </ul>
+      <p>
+        API de referência do plano:
+        <a href="https://fakerapi.it/" target="_blank" rel="noopener noreferrer">fakerapi.it</a>
+      </p>
+    </section>
+
+    <section>
+      <h2>Experimente no navegador</h2>
+      <p>
+        Esta página carrega o jQuery via CDN e faz um <code>$.getJSON</code> de exemplo
+        (requer conexão e Live Server recomendado):
+      </p>
+      <button type="button" id="btn-jquery">Buscar com $.getJSON</button>
+      <pre id="saida-console" aria-live="polite">Clique no botão para testar o jQuery.</pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>jQuery <strong>abstrai</strong> o XHR; por baixo ainda é requisição HTTP assíncrona.</li>
+        <li><code>$.ajax</code> — opção completa; <code>$.get</code> / <code>$.post</code> — atalhos.</li>
+        <li><code>dataType: "json"</code> evita <code>JSON.parse</code> manual na maioria dos casos.</li>
+        <li>Próximo passo: <a href="jquery-callbacks.html">Callbacks no jQuery</a> (success, error e encadeamento).</li>
+      </ul>
+    </section>
+
+    <footer>PDI Front — jQuery e abstração do XHR</footer>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script>
+    document.getElementById("btn-jquery").addEventListener("click", function () {
+      const saida = document.getElementById("saida-console");
+      const btn = this;
+      const url = "https://jsonplaceholder.typicode.com/posts/1";
+
+      if (typeof $ === "undefined") {
+        saida.textContent = "jQuery não carregou. Verifique sua conexão.";
+        return;
+      }
+
+      saida.textContent = "Chamando $.getJSON em " + url + " ...";
+      btn.disabled = true;
+
+      $.getJSON(url)
+        .done(function (post) {
+          saida.textContent =
+            "success (jQuery)\n\n" +
+            "Título: " + post.title + "\n" +
+            "Corpo: " + post.body;
+        })
+        .fail(function (xhr, status, erro) {
+          saida.textContent =
+            "error (jQuery)\n" +
+            "status: " + status + "\n" +
+            "detalhe: " + erro + "\n\n" +
+            "Se for CORS/rede, use Live Server.";
+        })
+        .always(function () {
+          btn.disabled = false;
+        });
+    });
+  </script>
+</body>
+</html>

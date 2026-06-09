@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fetch API — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Fetch API</h1>
+    <p class="subtitle">
+      Requisições HTTP com JavaScript nativo — sem jQuery e sem montar XHR manualmente.
+    </p>
+
+    <section>
+      <h2>O que é a Fetch API?</h2>
+      <p>
+        <strong><code>fetch()</code></strong> é uma função global do navegador (desde ~2015)
+        para fazer requisições HTTP. Ela retorna uma <strong>Promise</strong> e substitui,
+        na prática, o trio XHR + callbacks + bibliotecas para a maioria dos casos novos.
+      </p>
+      <div class="card">
+        <strong>Evolução no seu PDI:</strong> XHR puro → jQuery (<code>$.ajax</code>) →
+        <strong>Fetch</strong> (nativo). Na Etapa 3 da aplicação prática você refatora o app
+        de livros trocando jQuery por <code>fetch</code>.
+      </div>
+    </section>
+
+    <section>
+      <h2>GET básico</h2>
+<pre><code>fetch("https://api.exemplo.com/livros/1")
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (livro) {
+    console.log(livro);
+  })
+  .catch(function (erro) {
+    console.error("Falha:", erro);
+  });</code></pre>
+      <p>
+        <code>fetch(url)</code> dispara um GET. O 1º <code>.then</code> recebe o objeto
+        <strong>Response</strong>; o 2º recebe os dados já parseados.
+      </p>
+    </section>
+
+    <section>
+      <h2>O objeto <code>Response</code></h2>
+      <ul>
+        <li><code>response.ok</code> — <code>true</code> se status for 200–299</li>
+        <li><code>response.status</code> — código HTTP (200, 404, 500…)</li>
+        <li><code>response.json()</code> — lê o corpo como JSON (retorna Promise)</li>
+        <li><code>response.text()</code> — lê o corpo como string</li>
+      </ul>
+      <div class="card">
+        <strong>Atenção:</strong> <code>fetch</code> só vai para <code>.catch()</code> em
+        falha de <em>rede</em> (sem conexão, CORS bloqueado). Em <strong>404 ou 500</strong>,
+        a Promise resolve normalmente — você precisa checar <code>response.ok</code>.
+      </div>
+<pre><code>fetch("https://api.exemplo.com/livros/999")
+  .then(function (response) {
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status);
+    }
+    return response.json();
+  })
+  .then(function (livro) {
+    console.log(livro);
+  })
+  .catch(function (erro) {
+    console.error(erro.message);
+  });</code></pre>
+    </section>
+
+    <section>
+      <h2>POST com JSON</h2>
+      <p>
+        O 2º argumento de <code>fetch</code> é um objeto de opções — equivalente ao
+        config do <code>$.ajax</code>:
+      </p>
+<pre><code>fetch("https://api.exemplo.com/livros", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    titulo: "Dom Casmurro",
+    autor: "Machado de Assis"
+  })
+})
+  .then(function (response) {
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    return response.json();
+  })
+  .then(function (livroCriado) {
+    console.log("Criado:", livroCriado);
+  });</code></pre>
+      <ul>
+        <li><code>method</code> — GET, POST, PUT, DELETE…</li>
+        <li><code>headers</code> — cabeçalhos (como <code>contentType</code> no jQuery)</li>
+        <li><code>body</code> — corpo da requisição (POST/PUT/PATCH)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Fetch vs jQuery — mesma ideia, sintaxe diferente</h2>
+      <h3>jQuery</h3>
+<pre><code>$.getJSON("/livros/1", function (livro) {
+  console.log(livro);
+});</code></pre>
+      <h3>Fetch</h3>
+<pre><code>fetch("/livros/1")
+  .then(function (r) { return r.json(); })
+  .then(function (livro) { console.log(livro); });</code></pre>
+      <p>
+        No Fetch você monta headers e body manualmente, mas não precisa instalar jQuery.
+        O parse JSON é <code>response.json()</code> — parecido com <code>dataType: "json"</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2><code>async</code> / <code>await</code> (visão rápida)</h2>
+      <p>
+        Com Fetch + Promises, dá para escrever código que parece síncrono. Você verá isso
+        com mais detalhe no assunto <strong>async/await</strong>:
+      </p>
+<pre><code>async function carregarLivro(id) {
+  const response = await fetch("https://api.exemplo.com/livros/" + id);
+
+  if (!response.ok) {
+    throw new Error("HTTP " + response.status);
+  }
+
+  const livro = await response.json();
+  return livro;
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>Experimente no navegador</h2>
+      <p>Teste um GET com <code>fetch</code> na JSONPlaceholder:</p>
+      <button type="button" id="btn-fetch">Buscar com fetch()</button>
+      <pre id="saida-console" aria-live="polite">Clique no botão para testar.</pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li><code>fetch(url, options)</code> — HTTP nativo; retorna Promise.</li>
+        <li>Leia o corpo com <code>response.json()</code> ou <code>response.text()</code>.</li>
+        <li>Verifique <code>response.ok</code> — 4xx/5xx não caem no <code>catch</code> sozinhos.</li>
+        <li>Substitui jQuery/XHR em projetos modernos sem dependência extra.</li>
+        <li>Próximo passo: <a href="promises-xhr.html">Promises e XHR</a>.</li>
+      </ul>
+    </section>
+
+    <footer>PDI Front — Fetch API</footer>
+  </main>
+
+  <script>
+    document.getElementById("btn-fetch").addEventListener("click", function () {
+      const saida = document.getElementById("saida-console");
+      const btn = this;
+      const url = "https://jsonplaceholder.typicode.com/posts/1";
+
+      saida.textContent = "fetch(\"" + url + "\") em andamento...";
+      btn.disabled = true;
+
+      fetch(url)
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+          }
+          return response.json();
+        })
+        .then(function (post) {
+          saida.textContent =
+            "fetch() — sucesso\n" +
+            "status: 200\n\n" +
+            "Título: " + post.title + "\n" +
+            "Corpo: " + post.body;
+        })
+        .catch(function (erro) {
+          saida.textContent =
+            "fetch() — erro\n" + erro.message + "\n\n" +
+            "Se for CORS/rede, use Live Server.";
+        })
+        .finally(function () {
+          btn.disabled = false;
+        });
+    });
+  </script>
+</body>
+</html>

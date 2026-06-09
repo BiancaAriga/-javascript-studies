@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prática — Lista de livros XHR</title>
+    <link rel="stylesheet" href="../estilos.css">
+</head>
+
+<body>
+    <main>
+        <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+        <h1>Prática: lista de livros com XHR</h1>
+        <p class="subtitle">
+            Estrutura base para implementar sua requisição <code>XMLHttpRequest</code>.
+        </p>
+
+        <section>
+            <h2>O que você vai fazer</h2>
+            <p>
+                Crie uma requisição XHR para buscar livros de uma API e mostrar os resultados na tela.
+                A base abaixo já inclui o botão, a área de carregamento e o lugar para renderizar os livros.
+            </p>
+            <ul>
+                <li>Use <code>XMLHttpRequest</code> com <code>open()</code>, <code>send()</code> e callbacks.</li>
+                <li>Trate sucesso e erro.</li>
+                <li>Mostre um estado de carregamento enquanto a requisição está em andamento.</li>
+            </ul>
+        </section>
+
+        <section>
+            <button type="button" id="btn-carregar">Carregar livros</button>
+            <p id="status">Clique em carregar para buscar os livros.</p>
+            <ul id="lista-livros" class="lista-livros"></ul>
+        </section>
+
+        <section>
+            <h2>Observações</h2>
+            <p>
+                A API sugerida é
+                <code>https://fakerapi.it/api/v1/books?_quantity=10</code>.
+                Se preferir, use outra URL de API que retorne JSON.
+            </p>
+        </section>
+
+        <footer>PDI Front — Prática 1: lista de livros XHR</footer>
+    </main>
+
+    <script>
+        const API_URL = "https://fakerapi.it/api/v1/books?_quantity=10";
+        const btnCarregar = document.getElementById("btn-carregar");
+        const status = document.getElementById("status");
+        const listaLivros = document.getElementById("lista-livros");
+
+        btnCarregar.addEventListener("click", carregarLivros);
+
+        function carregarLivros() {
+            atualizarStatus("Carregando livros...");
+            limparLista();
+            btnCarregar.disabled = true;
+
+            const xhr = new XMLHttpRequest();
+
+            xhr.open("GET", API_URL, true);
+
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const dados = JSON.parse(xhr.responseText);
+                    console.log(dados.data);
+                    console.log(Array.isArray(dados.data));
+                    renderizarLivros(dados.data)
+                    atualizarStatus("Livros carregados com sucesso.");
+                } else {
+                    console.error("Erro HTTP:", xhr.status);
+                    atualizarStatus("Erro ao carregar livros.");
+                }
+            };
+
+            xhr.onerror = function () {
+                console.error("Falha de rede ou CORS");
+            };
+
+            xhr.send(); // GET não envia corpo'
+        }
+
+        function renderizarLivros(livros) {
+            if (!livros || livros.length === 0) {
+                listaLivros.innerHTML = "<li>Nenhum livro encontrado.</li>";
+                return;
+            }
+
+            listaLivros.innerHTML = livros
+                .map(function (livro) {
+                    return "<li>" +
+                        "<strong>" + livro.title + "</strong> — " +
+                        (livro.author || livro.author_name || livro.author || "Autor desconhecido") +
+                        "</li>";
+                })
+                .join("");
+        }
+
+        function atualizarStatus(mensagem) {
+            status.textContent = mensagem;
+        }
+
+        function limparLista() {
+            listaLivros.innerHTML = "";
+        }
+    </script>
+</body>
+
+</html>

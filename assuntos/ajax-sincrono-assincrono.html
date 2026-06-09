@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AJAX síncrono vs assíncrono — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>AJAX síncrono vs assíncrono</h1>
+    <p class="subtitle">
+      Entenda a diferença entre fazer requisições que bloqueiam a página e requisições que rodam em segundo plano.
+    </p>
+
+    <section>
+      <h2>O que é AJAX?</h2>
+      <p>
+        <strong>AJAX</strong> é a técnica de usar JavaScript para fazer requisições HTTP
+        sem recarregar toda a página. O navegador busca ou envia dados ao servidor e
+        atualiza só o que precisa, deixando a experiência mais fluida.
+      </p>
+    </section>
+
+    <section>
+      <h2>Síncrono: bloqueia a página</h2>
+      <p>
+        Na versão síncrona, o JavaScript espera a resposta do servidor antes de continuar.
+        Isso significa que o navegador fica parado até a requisição terminar.
+      </p>
+<pre><code>const xhr = new XMLHttpRequest();
+xhr.open("GET", "https://jsonplaceholder.typicode.com/posts/1", false);
+xhr.send();
+
+if (xhr.status >= 200 && xhr.status < 300) {
+  console.log(JSON.parse(xhr.responseText));
+}
+</code></pre>
+      <p>
+        Repare no terceiro argumento de <code>open()</code>: <code>false</code> torna a
+        chamada síncrona. Enquanto isso, o usuário não consegue interagir com a página.
+      </p>
+      <div class="card">
+        <strong>Atenção:</strong> o uso de XHR síncrono no navegador é desencorajado.
+        Ele bloqueia a interface e pode ser removido de alguns navegadores no futuro.
+      </div>
+    </section>
+
+    <section>
+      <h2>Assíncrono: continua rodando</h2>
+      <p>
+        A forma assíncrona dispara a requisição e deixa o navegador livre para seguir com
+        outras tarefas. Quando a resposta chega, o código de callback ou evento é executado.
+      </p>
+<pre><code>const xhr = new XMLHttpRequest();
+xhr.open("GET", "https://jsonplaceholder.typicode.com/posts/1", true);
+xhr.onload = function () {
+  if (xhr.status >= 200 && xhr.status < 300) {
+    console.log(JSON.parse(xhr.responseText));
+  }
+};
+xhr.onerror = function () {
+  console.error("Erro na requisição");
+};
+xhr.send();
+</code></pre>
+      <p>
+        O valor <code>true</code> em <code>open()</code> é o padrão. Isso garante que a requisição
+        não bloqueie o restante do script ou a interface do usuário.
+      </p>
+    </section>
+
+    <section>
+      <h2>Por que usar assíncrono?</h2>
+      <ul>
+        <li>O usuário não perde o controle da página.</li>
+        <li>Você pode mostrar indicadores de carregamento enquanto espera a resposta.</li>
+        <li>O navegador pode executar outras tarefas ao mesmo tempo.</li>
+      </ul>
+      <p>
+        Por isso, quase todas as APIs modernas usam assíncrono. Com <code>fetch()</code>,
+        por exemplo, a Promise permite esse fluxo sem bloquear a página.
+      </p>
+    </section>
+
+    <section>
+      <h2>Experimente no navegador</h2>
+      <p>
+        O botão abaixo faz uma requisição assíncrona e mostra o resultado no parágrafo.
+      </p>
+      <button type="button" id="btn-async-xhr">Fazer requisição assíncrona</button>
+      <pre id="saida-console" aria-live="polite">Clique no botão para testar.</pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>AJAX síncrono bloqueia a página enquanto espera a resposta.</li>
+        <li>AJAX assíncrono permite que a página continue respondendo ao usuário.</li>
+        <li>Use sempre assíncrono para melhor experiência e desempenho.</li>
+        <li>O <code>fetch()</code> é uma forma moderna de trabalhar com AJAX assíncrono.</li>
+      </ul>
+      <p>
+        Para continuar, veja também os assuntos de <a href="requisicoes-xhr.html">Requisições XHR</a>
+        e <a href="fetch-api.html">Fetch API</a>.
+      </p>
+    </section>
+
+    <footer>PDI Front — AJAX síncrono vs assíncrono</footer>
+  </main>
+
+  <script>
+    document.getElementById("btn-async-xhr").addEventListener("click", function () {
+      const saida = document.getElementById("saida-console");
+      const btn = this;
+      const url = "https://jsonplaceholder.typicode.com/posts/1";
+
+      saida.textContent = "Enviando requisição assíncrona...";
+      btn.disabled = true;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+
+      xhr.onload = function () {
+        btn.disabled = false;
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const post = JSON.parse(xhr.responseText);
+          saida.textContent =
+            "Sucesso:\n\n" +
+            "Título: " + post.title + "\n" +
+            "Corpo: " + post.body;
+        } else {
+          saida.textContent = "Erro HTTP: " + xhr.status;
+        }
+      };
+
+      xhr.onerror = function () {
+        btn.disabled = false;
+        saida.textContent = "Falha na requisição.";
+      };
+
+      xhr.send();
+    });
+  </script>
+</body>
+</html>

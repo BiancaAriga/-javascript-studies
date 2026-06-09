@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus estudos — Front-end</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <main>
+    <h1>Olá, estudante!</h1>
+    <p class="subtitle">Este é seu ponto de partida para aprender HTML, CSS e JavaScript.</p>
+
+    <section>
+      <h2>Assuntos de estudo</h2>
+      <p>Escolha um tema para ler a teoria, ver exemplos e praticar:</p>
+      <ul class="topicos">
+        <li>
+          <a href="assuntos/escopo-funcoes-iife.html">
+            Escopo de funções e IIFE
+            <span>Escopo local vs global, IIFE e gerenciamento de variáveis</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/requisicoes-xhr.html">
+            Requisições XHR
+            <span>XMLHttpRequest: GET, POST, status e readyState</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/jquery-xhr.html">
+            jQuery e abstração do XHR
+            <span>$.ajax, $.get, $.post e comparação com XHR puro</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/jquery-callbacks.html">
+            Callbacks no jQuery
+            <span>success, error, complete e .done() / .fail() / .always()</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/fetch-api.html">
+            Fetch API
+            <span>fetch(), Response, GET/POST e comparação com jQuery</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/promises-xhr.html">
+            Promises e XHR
+            <span>Encadeamento de eventos assíncronos — aprenda a usar XHR com Promises</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/ajax-sincrono-assincrono.html">
+            AJAX síncrono vs assíncrono
+            <span>Quando usar cada um e impacto na experiência</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/async-await.html" class="em-breve">
+            Async / await
+            <span>Sintaxe moderna para código assíncrono — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/http-conceitos.html" class="em-breve">
+            Conceitos de HTTP
+            <span>Method, status code, URL, URI, path e headers — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/cors.html" class="em-breve">
+            CORS
+            <span>Quando ocorre o erro e como resolver — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/manipulacao-json.html" class="em-breve">
+            Manipulação de JSON
+            <span>Parse, stringify e trabalhar com respostas de API — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/armazenamento-front.html" class="em-breve">
+            Armazenamento no front-end
+            <span>Session Storage, Local Storage e cookies — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/autenticacao.html" class="em-breve">
+            Autenticação
+            <span>Headers de Authorization — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/classes-objetos.html" class="em-breve">
+            Classes e objetos
+            <span>O que é classe e o que é objeto em JavaScript — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/postman.html" class="em-breve">
+            Postman
+            <span>Ferramenta para testar requisições HTTP — em breve</span>
+          </a>
+        </li>
+        <li>
+          <a href="assuntos/devtools-network.html" class="em-breve">
+            DevTools — aba Network
+            <span>Inspecionar requisições HTTP no navegador — em breve</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="secao-pratica">
+      <h2>Aplicação prática</h2>
+      <p class="meta-pdi">
+        <strong>70% do PDI</strong> — projeto lista de livros com
+        <a href="https://fakerapi.it/" target="_blank" rel="noopener noreferrer">Faker API</a>.
+        Prazo: 21/05/2026 a 31/08/2026.
+      </p>
+      <p>
+        Cada etapa refatora o mesmo app para aplicar o que você estudou na seção acima.
+        Os links serão habilitados conforme você for implementando.
+      </p>
+      <ul class="topicos topicos-pratica">
+        <li>
+          <a href="pratica/lista-livros-xhr.html">
+            <span class="etapa">Etapa 1</span>
+            App inicial com XHR
+            <span>HTML, CSS e JS — listar livros da Faker API com XMLHttpRequest</span>
+          </a>
+        </li>
+        <li>
+          <a href="app/lista-livros-jquery.html" class="em-breve">
+            <span class="etapa">Etapa 2</span>
+            Refatoração com jQuery
+            <span>Trocar XHR por $.ajax / $.get — comparar diferenças e melhorias</span>
+          </a>
+        </li>
+        <li>
+          <a href="app/lista-livros-fetch.html" class="em-breve">
+            <span class="etapa">Etapa 3</span>
+            Refatoração com Fetch API
+            <span>Substituir jQuery por JavaScript nativo — comparar com as etapas anteriores</span>
+          </a>
+        </li>
+        <li>
+          <a href="app/simulacao-cors.html" class="em-breve">
+            <span class="etapa">Etapa 4</span>
+            Simulação de erro CORS
+            <span>“Quebrar” o app de propósito — identificar quando ocorre e como resolver</span>
+          </a>
+        </li>
+        <li>
+          <a href="app/lista-livros-iife.html" class="em-breve">
+            <span class="etapa">Etapa 5</span>
+            Refatoração com IIFE
+            <span>Isolar variáveis e evitar poluição do escopo global</span>
+          </a>
+        </li>
+        <li>
+          <a href="app/crud-session-storage.html" class="em-breve">
+            <span class="etapa">Etapa 6</span>
+            CRUD com Session Storage
+            <span>Persistir livros da API — criar, ler, atualizar e excluir na sessão</span>
+          </a>
+        </li>
+        <li>
+          <a href="app/crud-local-storage.html" class="em-breve">
+            <span class="etapa">Etapa 7</span>
+            Refatoração para Local Storage
+            <span>Migrar de Session Storage — o que muda no comportamento?</span>
+          </a>
+        </li>
+        <li>
+          <a href="pratica/postman-fakerapi.html" class="em-breve">
+            <span class="etapa">Etapa 8</span>
+            Coleções no Postman
+            <span>Simular cada requisição da Faker API em coleções Postman</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>O que é esta página?</h2>
+      <p>
+        Um arquivo <code>index.html</code> é a estrutura básica de qualquer site.
+        Aqui você pode editar o texto, mudar cores em <code>estilos.css</code>
+        e experimentar scripts no final do arquivo.
+      </p>
+    </section>
+
+    <footer>
+      PDI Front — arquivo criado para estudos. Edite à vontade!
+    </footer>
+  </main>
+</body>
+</html>

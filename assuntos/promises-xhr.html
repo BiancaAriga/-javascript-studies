@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promises e XHR — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Promises e XHR</h1>
+    <p class="subtitle">
+      Como usar Promises para organizar requisições XHR e encadear o tratamento assíncrono.
+    </p>
+
+    <section>
+      <h2>Por que Promises com XHR?</h2>
+      <p>
+        XHR funciona com callbacks ou eventos (<code>onload</code>, <code>onerror</code>),
+        mas isso pode gerar código difícil de ler quando há várias requisições.
+        <strong>Promises</strong> ajudam a escrever esse fluxo de forma mais clara,
+        usando <code>.then()</code>, <code>.catch()</code> e <code>.finally()</code>.
+      </p>
+      <div class="card">
+        <strong>Ligação com os outros assuntos:</strong> o XHR clássico é a base,
+        o <code>fetch()</code> substitui XHR em projetos modernos, mas o conceito de Promise
+        é útil para entender <code>fetch</code> e <code>async/await</code>.
+      </div>
+    </section>
+
+    <section>
+      <h2>Transformando XHR em Promise</h2>
+      <p>
+        Uma <strong>Promise</strong> representa um resultado que ainda não chegou.
+        No XHR, você já tem um momento em que a requisição termina: <code>onload</code>
+        ou <code>onerror</code>. Com uma Promise, colocamos o sucesso em
+        <code>resolve()</code> e o erro em <code>reject()</code>.
+      </p>
+<pre><code>function xhrPromise(method, url) {
+  return new Promise(function (resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.responseText);
+      } else {
+        reject(new Error("HTTP " + xhr.status));
+      }
+    };
+
+    xhr.onerror = function () {
+      reject(new Error("Falha de rede ou CORS"));
+    };
+
+    xhr.send();
+  });
+}
+</code></pre>
+      <p>
+        Agora, <code>xhrPromise("GET", url)</code> devolve uma Promise.
+        Se a requisição for bem-sucedida, o próximo <code>.then()</code> recebe a resposta.
+        Se der erro, o <code>.catch()</code> captura tudo.
+      </p>
+    </section>
+
+    <section>
+      <h2>Encadeando .then() e .catch()</h2>
+<pre><code>xhrPromise("GET", "https://jsonplaceholder.typicode.com/posts/1")
+  .then(function (responseText) {
+    const post = JSON.parse(responseText);
+    console.log(post);
+    return xhrPromise("GET", "https://jsonplaceholder.typicode.com/users/" + post.userId);
+  })
+  .then(function (userText) {
+    const usuario = JSON.parse(userText);
+    console.log("Autor:", usuario.name);
+  })
+  .catch(function (erro) {
+    console.error("Deu ruim:", erro.message);
+  });
+</code></pre>
+      <p>
+        Primeiro você faz uma requisição. No <code>.then()</code>, você recebe a resposta
+        e pode iniciar outra requisição. Como o segundo <code>.then()</code> recebe
+        a Promise retornada pelo primeiro, ele espera a segunda requisição terminar.
+      </p>
+      <p>
+        Em outras palavras: cada <code>.then()</code> trata o próximo passo do fluxo.
+      </p>
+    </section>
+
+    <section>
+      <h2>Erros e tratamento único</h2>
+      <p>
+        Com Promises, você trata falhas em um só lugar usando <code>.catch()</code>.
+        Isso evita duplicar callbacks de erro para cada requisição.
+      </p>
+<pre><code>xhrPromise("GET", "https://api.exemplo.com/dados")
+  .then(function (texto) {
+    return JSON.parse(texto);
+  })
+  .then(function (dados) {
+    console.log(dados);
+  })
+  .catch(function (erro) {
+    console.error("Erro no fluxo de requisições:", erro);
+  })
+  .finally(function () {
+    console.log("Fluxo de requisição finalizado");
+  });
+</code></pre>
+      <p>
+        <code>.finally()</code> roda independente do sucesso ou erro, ideal para
+        liberar recursos ou habilitar botões após a requisição.
+      </p>
+    </section>
+
+    <section>
+      <h2>XHR + Promise vs Fetch</h2>
+      <p>
+        O <code>fetch()</code> já retorna uma Promise nativa. O exemplo abaixo mostra a mesma ideia:
+      </p>
+<pre><code>fetch("https://jsonplaceholder.typicode.com/posts/1")
+  .then(function (response) {
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    return response.json();
+  })
+  .then(function (post) {
+    console.log(post);
+  })
+  .catch(function (erro) {
+    console.error(erro);
+  });
+</code></pre>
+      <p>
+        Usar Promises com XHR ajuda a entender o comportamento do Fetch e facilita a migração
+        de código legado para APIs mais modernas.
+      </p>
+    </section>
+
+    <section>
+      <h2>Experimente no navegador</h2>
+      <p>
+        O botão abaixo faz um GET com XHR encapsulado em Promise e mostra a resposta.
+      </p>
+      <button type="button" id="btn-promisse-xhr">Buscar post</button>
+      <pre id="saida-console" aria-live="polite">Clique no botão para testar.</pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>Promises tornam o fluxo assíncrono do XHR mais legível e encadeável.</li>
+        <li><code>resolve()</code> indica sucesso; <code>reject()</code> indica erro.</li>
+        <li><code>.then()</code> pode retornar outra Promise para criar sequências de chamadas.</li>
+        <li><code>.catch()</code> centraliza o tratamento de falhas.</li>
+        <li>Fetch é o próximo passo natural, pois já trabalha com Promises nativas.</li>
+      </ul>
+      <p>
+        Para continuar, veja também os assuntos de <a href="requisicoes-xhr.html">Requisições XHR</a>
+        e <a href="fetch-api.html">Fetch API</a>.
+      </p>
+    </section>
+
+    <footer>PDI Front — Promises e XHR</footer>
+  </main>
+
+  <script>
+    function xhrPromise(method, url, body) {
+      return new Promise(function (resolve, reject) {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, url, true);
+
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(xhr.responseText);
+          } else {
+            reject(new Error("HTTP " + xhr.status));
+          }
+        };
+
+        xhr.onerror = function () {
+          reject(new Error("Falha de rede ou CORS"));
+        };
+
+        if (body) {
+          // Para enviar dados JSON, defina o header e stringify o corpo POST
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.send(JSON.stringify(body));
+        } else {
+          xhr.send();
+        }
+      });
+    }
+
+    document.getElementById("btn-promisse-xhr").addEventListener("click", function () {
+      const saida = document.getElementById("saida-console");
+      const btn = this;
+      const url = "https://jsonplaceholder.typicode.com/posts/1";
+
+      saida.textContent = "Buscando post...";
+      btn.disabled = true;
+
+      xhrPromise("GET", url)
+        .then(function (responseText) {
+          const post = JSON.parse(responseText);
+          saida.textContent =
+            "Sucesso (post):\n\n" +
+            "Título: " + post.title + "\n" +
+            "Corpo: " + post.body;
+        })
+        .catch(function (erro) {
+          saida.textContent = "Erro: " + erro.message;
+        })
+        .finally(function () {
+          btn.disabled = false;
+        });
+    });
+  </script>
+</body>
+</html>

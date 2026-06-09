@@ -1,0 +1,217 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  color: #1a1a2e;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.text--highlight {
+  background-color: #FFF4A3;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: #16213e;
+}
+
+.subtitle {
+  color: #5c6b7a;
+  margin-bottom: 2rem;
+}
+
+section {
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 1.1rem;
+  color: #0f3460;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid #e94560;
+  padding-bottom: 0.25rem;
+  display: inline-block;
+}
+
+h3 {
+  font-size: 1rem;
+  color: #16213e;
+  margin: 1.25rem 0 0.5rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+ul,
+ol {
+  margin-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+li {
+  margin-bottom: 0.35rem;
+}
+
+.card {
+  background: #f8f9fc;
+  border-left: 4px solid #e94560;
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  margin: 1rem 0;
+}
+
+code {
+  background: #eee;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+pre {
+  background: #1a1a2e;
+  color: #e8ecf1;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.75rem 0 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.topicos {
+  list-style: none;
+  margin-left: 0;
+}
+
+.topicos li {
+  margin-bottom: 0.75rem;
+}
+
+.topicos a {
+  display: block;
+  padding: 1rem 1.25rem;
+  background: #f8f9fc;
+  border: 1px solid #e0e4ea;
+  border-radius: 8px;
+  color: #0f3460;
+  text-decoration: none;
+  font-weight: 600;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.topicos a:hover {
+  border-color: #e94560;
+  box-shadow: 0 2px 12px rgba(233, 69, 96, 0.15);
+}
+
+.topicos a span {
+  display: block;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #5c6b7a;
+  margin-top: 0.25rem;
+}
+
+.topicos a.em-breve {
+  opacity: 0.6;
+  cursor: default;
+  pointer-events: none;
+}
+
+.secao-pratica .meta-pdi {
+  font-size: 0.9rem;
+  color: #5c6b7a;
+  margin-bottom: 1rem;
+}
+
+.topicos-pratica a {
+  border-left: 4px solid #0f3460;
+}
+
+.topicos-pratica .etapa {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #e94560;
+  margin-bottom: 0.35rem;
+}
+
+.voltar {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #e94560;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.voltar:hover {
+  text-decoration: underline;
+}
+
+button {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #e94560;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #c73e54;
+}
+
+#mensagem,
+#saida-console {
+  margin-top: 1rem;
+  font-weight: 600;
+  color: #0f3460;
+}
+
+#saida-console {
+  font-weight: 400;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.9rem;
+  background: #f8f9fc;
+  padding: 1rem;
+  border-radius: 8px;
+  white-space: pre-wrap;
+}
+
+footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+  font-size: 0.85rem;
+  color: #888;
+}

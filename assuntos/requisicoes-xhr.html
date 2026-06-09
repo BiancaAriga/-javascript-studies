@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requisições XHR — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Requisições com XMLHttpRequest (XHR)</h1>
+    <p class="subtitle">
+      Como o navegador busca ou envia dados a um servidor sem recarregar a página inteira.
+    </p>
+
+    <section>
+      <h2>O que é XHR?</h2>
+      <p>
+        <strong>XMLHttpRequest</strong> é a API clássica do JavaScript para fazer
+        <strong>requisições HTTP</strong> de forma assíncrona: o script continua rodando
+        enquanto espera a resposta do servidor (por exemplo, uma API REST).
+      </p>
+      <p>
+        Apesar do nome mencionar XML, hoje o mais comum é trocar <strong>JSON</strong>
+        com APIs modernas. O fluxo básico é sempre o mesmo: criar o objeto, configurar,
+        enviar e tratar o retorno em callbacks ou eventos.
+      </p>
+    </section>
+
+    <section>
+      <h2>Passo a passo</h2>
+      <ol>
+        <li><code>new XMLHttpRequest()</code> — cria a instância</li>
+        <li><code>open(método, url, async)</code> — define GET/POST, URL e se é assíncrono</li>
+        <li><code>setRequestHeader()</code> — opcional (tipo do corpo, token, etc.)</li>
+        <li><code>send(corpo)</code> — dispara a requisição</li>
+        <li>Escutar <code>onload</code> / <code>onerror</code> ou <code>onreadystatechange</code> — ler a resposta</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>GET — buscar dados</h2>
+<pre><code>const xhr = new XMLHttpRequest();
+
+xhr.open("GET", "https://api.exemplo.com/usuarios/1", true);
+
+xhr.onload = function () {
+  if (xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) {
+    const dados = JSON.parse(xhr.responseText);
+    console.log(dados);
+  } else {
+    console.error("Erro HTTP:", xhr.status);
+  }
+};
+
+xhr.onerror = function () {
+  console.error("Falha de rede ou CORS");
+};
+
+xhr.send(); // GET não envia corpo</code></pre>
+      <p>
+        <code>xhr.responseText</code> traz o corpo da resposta como string.
+        Se for JSON, use <code>JSON.parse()</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2>POST — enviar dados</h2>
+<pre><code>const xhr = new XMLHttpRequest();
+const payload = JSON.stringify({ nome: "Ana", email: "ana@email.com" });
+
+xhr.open("POST", "https://api.exemplo.com/usuarios", true);
+xhr.setRequestHeader("Content-Type", "application/json");
+
+xhr.onload = function () {
+  if (xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) {
+    console.log("Criado:", JSON.parse(xhr.responseText));
+  }
+};
+
+xhr.send(payload); // corpo vai no send()</code></pre>
+      <p>
+        Em POST/PUT/PATCH, o corpo costuma ser JSON; o header
+        <code>Content-Type: application/json</code> avisa o servidor como interpretar.
+      </p>
+    </section>
+
+    <section>
+      <h2><code>readyState</code> e <code>status</code></h2>
+      <p>
+        Com <code>onreadystatechange</code>, você acompanha cada etapa da requisição.
+        O valor útil para ler a resposta é <code>readyState === 4</code> (concluída).
+      </p>
+<pre><code>xhr.onreadystatechange = function () {
+  if (xhr.readyState === 4) {
+  // 0 UNSENT → 1 OPENED → 2 HEADERS → 3 LOADING → 4 DONE
+    console.log("Status:", xhr.status);
+    console.log("Resposta:", xhr.responseText);
+  }
+};</code></pre>
+      <ul>
+        <li><strong>2xx</strong> — sucesso (ex.: 200 OK, 201 Created)</li>
+        <li><strong>4xx</strong> — erro do cliente (404 não encontrado, 401 não autorizado)</li>
+        <li><strong>5xx</strong> — erro do servidor</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Outros métodos HTTP</h2>
+      <p>
+        O primeiro argumento de <code>open()</code> aceita o verbo HTTP:
+        <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code>,
+        <code>DELETE</code>, etc. A diferença está no que você envia em
+        <code>send()</code> e no que a API espera receber.
+      </p>
+<pre><code>xhr.open("DELETE", "https://api.exemplo.com/usuarios/42", true);
+xhr.send();</code></pre>
+    </section>
+
+    <section>
+      <h2>CORS e ambiente de teste</h2>
+      <div class="card">
+        <strong>CORS:</strong> o navegador só deixa seu JavaScript ler a resposta se o
+        servidor permitir a origem da sua página (cabeçalho
+        <code>Access-Control-Allow-Origin</code>). APIs públicas de estudo, como
+        JSONPlaceholder, já liberam isso. Abrir o HTML direto como
+        <code>file://</code> às vezes complica testes — prefira Live Server ou um servidor local.
+      </div>
+    </section>
+
+    <section>
+      <h2>Experimente no navegador</h2>
+      <p>
+        O botão abaixo faz um GET real com XHR para
+        <code>jsonplaceholder.typicode.com</code> (API de exemplo):
+      </p>
+      <button type="button" id="btn-xhr">Fazer requisição GET</button>
+      <pre id="saida-console" aria-live="polite">Clique no botão para disparar o XHR.</pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>XHR comunica o front-end com APIs/servidores de forma <strong>assíncrona</strong>.</li>
+        <li><code>open</code> + <code>send</code> definem método, URL e corpo.</li>
+        <li>Trate sucesso pelo <code>status</code> e parseie <code>responseText</code> quando for JSON.</li>
+        <li>Use <code>onerror</code> para falhas de rede; verifique CORS se a resposta não chegar.</li>
+      </ul>
+      <div class="card">
+        <strong>Hoje em dia:</strong> muitos projetos usam <code>fetch()</code> ou bibliotecas
+        como Axios, que retornam Promises. O modelo mental do XHR (requisição → resposta → status)
+        continua válido para entender qualquer cliente HTTP no front-end.
+      </div>
+    </section>
+
+    <footer>PDI Front — Assunto 2: Requisições XHR</footer>
+  </main>
+
+  <script>
+    document.getElementById("btn-xhr").addEventListener("click", function () {
+      const saida = document.getElementById("saida-console");
+      const btn = this;
+      const url = "https://jsonplaceholder.typicode.com/posts/1";
+
+      saida.textContent = "Enviando GET para " + url + " ...";
+      btn.disabled = true;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+
+      xhr.onload = function () {
+        btn.disabled = false;
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const post = JSON.parse(xhr.responseText);
+          saida.textContent =
+            "Sucesso (status " + xhr.status + ")\n\n" +
+            "Título: " + post.title + "\n" +
+            "Corpo: " + post.body;
+        } else {
+          saida.textContent = "Erro HTTP: " + xhr.status + "\n" + xhr.responseText;
+        }
+      };
+
+      xhr.onerror = function () {
+        btn.disabled = false;
+        saida.textContent =
+          "Falha na requisição (rede ou CORS).\n" +
+          "Tente abrir a página com Live Server.";
+      };
+
+      xhr.send();
+    });
+  </script>
+</body>
+</html>

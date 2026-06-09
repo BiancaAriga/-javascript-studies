@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escopo de funções e IIFE — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Escopo de funções e IIFE</h1>
+    <p class="subtitle">
+      Escopo local, escopo global e como a IIFE ajuda a isolar variáveis no JavaScript.
+    </p>
+
+    <section>
+      <h2>O que é escopo?</h2>
+      <p>
+        <strong>Escopo</strong> define onde uma variável pode ser lida ou alterada.
+        Em JavaScript, o motor procura o nome da variável do bloco mais interno para o mais externo
+        — isso se chama <strong>cadeia de escopo</strong> (scope chain).
+      </p>
+      <div class="card">
+        <strong>Regra prática:</strong> uma variável só existe onde foi declarada
+        (com <code>let</code>, <code>const</code> ou <code>var</code>) e nos blocos filhos,
+        salvo exceções como variáveis globais.
+      </div>
+    </section>
+
+    <section>
+      <h2>Escopo global</h2>
+      <p>
+        Variáveis declaradas <em>fora</em> de qualquer função ou bloco ficam no
+        <strong>escopo global</strong> — em páginas web, isso costuma ser o objeto
+        <code>window</code> no navegador.
+      </p>
+      <pre><code>const appNome = "PDI Front";  // global
+
+function mostrarApp() {
+  console.log(appNome);       // acessa o global
+}
+
+mostrarApp(); // "PDI Front"</code></pre>
+      <p>
+        O problema: qualquer script na página pode ler ou sobrescrever o mesmo nome.
+        Em projetos maiores, isso gera conflitos e bugs difíceis de rastrear.
+      </p>
+    </section>
+
+    <section>
+      <h2>Escopo local (de função)</h2>
+      <p>
+        Dentro de uma função, variáveis declaradas com <code>let</code>,
+        <code>const</code> ou <code>var</code> pertencem ao <strong>escopo local</strong>
+        daquela função. Fora dela, não existem.
+      </p>
+      <pre><code>function contador() {
+  let total = 0;        // local — só existe aqui
+  total += 1;
+  return total;
+}
+
+contador(); // 1
+contador(); // 1 de novo (total é recriado a cada chamada)
+// console.log(total); // Erro: total is not defined</code></pre>
+      <p>
+        Parâmetros também são locais: <code>function soma(a, b) { ... }</code> —
+        <code>a</code> e <code>b</code> só vivem dentro de <code>soma</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Escopo de bloco (<code>let</code> e <code>const</code>)</h2>
+      <p>
+        Além do escopo de função, <code>let</code> e <code>const</code> respeitam
+        blocos <code>{ }</code> (por exemplo, dentro de <code>if</code> ou <code>for</code>).
+      </p>
+      <pre><code>if (true) {
+  const temporario = 42;
+}
+// console.log(temporario); // Erro: temporario is not defined</code></pre>
+      <p>
+        <code>var</code> ignora o bloco e “sobe” para o escopo da função ou global —
+        por isso hoje se prefere <code>let</code> e <code>const</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2>O que é IIFE?</h2>
+      <p>
+        <strong>IIFE</strong> significa <em>Immediately Invoked Function Expression</em>:
+        <span class="text--highlight">uma função criada e executada na mesma hora, sem precisar guardar referência a ela.</span>
+      </p>
+      <pre><code>(function () {
+  const segredo = "só existe aqui dentro";
+  console.log(segredo);
+})();
+
+// console.log(segredo); // Erro — variável isolada</code></pre>
+      <p>Formas equivalentes comuns:</p>
+      <pre><code>// Parênteses envolvendo a função
+(function () { /* ... */ })();
+
+// Ou o parêntese extra no início
+(function () { /* ... */ }());
+
+// Arrow function (ES6+)
+(() => {
+  const id = 1;
+})();</code></pre>
+    </section>
+
+    <section>
+      <h2>Como a IIFE afeta o gerenciamento de escopo</h2>
+      <ol>
+        <li>
+          <strong>Isolamento:</strong> variáveis dentro da IIFE não vazam para o escopo global,
+          reduzindo poluição do <code>window</code> e colisões de nomes.
+        </li>
+        <li>
+          <strong>Encapsulamento:</strong> você expõe só o que quiser retornando um objeto
+          ou atribuindo a uma variável global controlada (padrão módulo antigo), as variáveis internas são privadas caso não sejam retornadas.
+        </li>
+        <li>
+          <strong>Estado privado:</strong> funções internas podem usar variáveis da IIFE
+          sem que o resto do código as altere diretamente.
+        </li>
+      </ol>
+      <pre><code>const calculadora = (function () {
+  let memoria = 0;  // "privada" — só acessível dentro da IIFE
+
+  return {
+    somar(n) {
+      memoria += n;
+      return memoria;
+    },
+    ler() {
+      return memoria;
+    },
+    zerar() {
+      memoria = 0;
+    }
+  };
+})();
+
+calculadora.somar(10); // 10
+calculadora.somar(5);  // 15
+// memoria; // Erro — não está no escopo global</code></pre>
+      <div class="card">
+        <strong>Hoje em dia:</strong> em projetos modernos, módulos ES
+        (<code>import</code> / <code>export</code> em arquivos <code>.js</code>)
+        substituem boa parte do uso de IIFE. Mesmo assim, entender IIFE ajuda a ler
+        código legado e a perceber <em>por que</em> isolar escopo importa.
+      </div>
+    </section>
+
+    <section>
+      <h2>Comparando: sem IIFE vs com IIFE</h2>
+      <h3>Sem IIFE (risco de conflito)</h3>
+      <pre><code>var contador = 0;  // global — outro arquivo pode sobrescrever
+
+function incrementar() {
+  contador++;
+}</code></pre>
+      <h3>Com IIFE (nome protegido)</h3>
+      <pre><code>(function () {
+  let contador = 0;
+
+  window.incrementarSeguro = function () {
+    contador++;
+    return contador;
+  };
+})();</code></pre>
+      <p>
+        Aqui só <code>incrementarSeguro</code> fica global; <code>contador</code> permanece local.
+      </p>
+      <div class="card">
+        <strong>Closure (fechamento):</strong> quando <code>incrementarSeguro</code> é criada
+        dentro da IIFE, ela “lembra” o ambiente onde nasceu — inclusive a variável
+        <code>contador</code>, mesmo depois que a IIFE já terminou de executar.
+        Essa ligação entre função e variáveis do escopo externo é a
+        <strong>closure</strong>: a função continua acessando <code>contador</code> sem
+        expô-la no global. Por isso o padrão acima isola o estado e ainda permite usá-lo
+        de fora, só pela API que você publicou.
+      </div>
+    </section>
+
+    <section>
+      <h2>Experimente no navegador</h2>
+      <p>
+        Abra o DevTools (F12 → Console) e rode os exemplos desta página.
+        O botão abaixo executa uma IIFE que usa escopo local:
+      </p>
+      <button type="button" id="btn-iife">Executar exemplo IIFE</button>
+      <pre id="saida-console" aria-live="polite">Clique no botão para ver o resultado.</pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li><strong>Global:</strong> acessível em todo o script; use com moderação.</li>
+        <li><strong>Local (função/bloco):</strong> variável existe só onde foi declarada.</li>
+        <li><strong>IIFE:</strong> função executada na hora; cria um “módulo” temporário e isola variáveis.</li>
+        <li><strong>Objetivo:</strong> menos nomes no global, menos bugs por sobrescrita acidental.</li>
+      </ul>
+    </section>
+
+    <footer>PDI Front — Assunto 1: Escopo e IIFE</footer>
+  </main>
+
+  <script>
+    document.getElementById("btn-iife").addEventListener("click", function () {
+      const linhas = [];
+
+      (function () {
+        const mensagemLocal = "Estou dentro da IIFE — escopo local.";
+        linhas.push(mensagemLocal);
+
+        let contador = 0;
+        contador++;
+        linhas.push("contador (local): " + contador);
+      })();
+
+      linhas.push(typeof mensagemLocal === "undefined"
+        ? "mensagemLocal fora da IIFE: não existe (esperado)."
+        : "mensagemLocal vazou: " + mensagemLocal);
+
+      document.getElementById("saida-console").textContent = linhas.join("\n");
+    });
+  </script>
+</body>
+
+</html>
