@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conceitos de HTTP — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Conceitos de HTTP</h1>
+    <p class="subtitle">
+      Method, status code, URL, URI, path e headers — fundamentos das requisições.
+    </p>
+
+    <section>
+      <h2>O que é HTTP?</h2>
+      <p>
+        <strong>HTTP</strong> (HyperText Transfer Protocol) é o protocolo que o navegador
+        usa para comunicar com servidores. Toda vez que você faz uma requisição AJAX,
+        XHR, Fetch ou jQuery, está usando HTTP por baixo dos panos.
+      </p>
+      <p>
+        HTTP é <strong>stateless</strong>: cada requisição é independente. O servidor
+        não "lembra" das requisições anteriores, a menos que você use sessões ou tokens.
+      </p>
+    </section>
+
+    <section>
+      <h2>URL e URI</h2>
+      <p>
+        Às vezes as pessoas confundem <strong>URL</strong> e <strong>URI</strong>.
+        Tecnicamente:
+      </p>
+      <ul>
+        <li>
+          <strong>URI</strong> (Uniform Resource Identifier): identificador único
+          de um recurso. Exemplo: <code>/api/livros/42</code>
+        </li>
+        <li>
+          <strong>URL</strong> (Uniform Resource Locator): URI completa com protocolo e domínio.
+          Exemplo: <code>https://api.exemplo.com/api/livros/42</code>
+        </li>
+      </ul>
+      <p>
+        <strong>Na prática:</strong> todo URL é uma URI, mas nem toda URI é um URL.
+        Para seu PDI, o importante é saber que você está fazendo requisições para URLs.
+      </p>
+    </section>
+
+    <section>
+      <h2>Anatomia de uma URL</h2>
+      <pre><code>https://api.exemplo.com:8080/api/livros/42?ordenar=titulo&pagina=1#secao-reviews
+
+|      |                    |   |                       |
+|      |                    |   |                       └─ Fragment/Anchor
+|      |                    |   └─ Path (URI)
+|      |                    └─ Port (8080 é alternativo)
+|      └─ Domain
+└─ Protocol/Scheme</code></pre>
+      <ul>
+        <li><strong>Protocol:</strong> <code>https://</code> (ou <code>http://</code>)</li>
+        <li><strong>Domain:</strong> <code>api.exemplo.com</code></li>
+        <li><strong>Port:</strong> <code>:8080</code> (opcional; padrão é 80 para HTTP, 443 para HTTPS)</li>
+        <li><strong>Path:</strong> <code>/api/livros/42</code> (identifica o recurso)</li>
+        <li><strong>Query String:</strong> <code>?ordenar=titulo&pagina=1</code> (parâmetros)</li>
+        <li><strong>Fragment:</strong> <code>#secao-reviews</code> (não é enviado ao servidor)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>HTTP Methods (Verbos HTTP)</h2>
+      <p>
+        O HTTP define "métodos" ou "verbos" que indicam a <strong>ação</strong> que você
+        quer executar no servidor:
+      </p>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background-color: #f0f0f0;">
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Method</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Descrição</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Exemplo</th>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>GET</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Buscar/ler dados (seguro, idempotente)</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>GET /api/livros</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>POST</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Criar dados novos</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>POST /api/livros</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>PUT</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Substituir um recurso completo (idempotente)</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>PUT /api/livros/42</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>PATCH</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Atualizar parte de um recurso</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>PATCH /api/livros/42</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>DELETE</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Deletar um recurso (idempotente)</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>DELETE /api/livros/42</code></td>
+        </tr>
+      </table>
+      <p>
+        <strong>Idempotente</strong> significa que fazer a mesma requisição várias vezes
+        tem o mesmo efeito que fazer uma vez (GET, PUT, DELETE são idempotentes; POST não).
+      </p>
+    </section>
+
+    <section>
+      <h2>HTTP Status Codes</h2>
+      <p>
+        Toda resposta HTTP tem um <strong>status code</strong> (número de 3 dígitos)
+        que indica o resultado da requisição:
+      </p>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background-color: #f0f0f0;">
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Código</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Categoria</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Exemplos</th>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>1xx</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Informacional</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">100 Continue</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>2xx</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Sucesso ✓</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">200 OK, 201 Created, 204 No Content</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>3xx</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Redirecionamento</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">301 Moved Permanently, 304 Not Modified</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>4xx</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Erro do cliente</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">400 Bad Request, 401 Unauthorized, 404 Not Found</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><strong>5xx</strong></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Erro do servidor</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">500 Internal Server Error, 503 Service Unavailable</td>
+        </tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Verificando o status em JavaScript</h2>
+      <pre><code>// Com Fetch
+fetch("https://api.exemplo.com/livros/999")
+  .then(response => {
+    console.log(response.status);      // Ex: 404
+    console.log(response.statusText);  // Ex: "Not Found"
+    console.log(response.ok);          // true se 200-299, false caso contrário
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+  })
+  .catch(error => console.error(error));
+
+// Com XHR
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "https://api.exemplo.com/livros/999");
+xhr.onload = function() {
+  console.log(xhr.status);      // Ex: 404
+  console.log(xhr.statusText);  // Ex: "Not Found"
+  
+  if (xhr.status === 200) {
+    const dados = JSON.parse(xhr.responseText);
+  }
+};
+xhr.send();</code></pre>
+    </section>
+
+    <section>
+      <h2>HTTP Headers</h2>
+      <p>
+        <strong>Headers</strong> são metadados que acompanham requisições e respostas.
+        São pares <code>chave: valor</code> que comunicam informações extras.
+      </p>
+      <h3>Headers comuns de requisição:</h3>
+      <pre><code>Content-Type: application/json
+Authorization: Bearer seu_token_aqui
+Accept: application/json
+User-Agent: Mozilla/5.0...</code></pre>
+      <h3>Headers comuns de resposta:</h3>
+      <pre><code>Content-Type: application/json
+Content-Length: 1234
+Cache-Control: max-age=3600
+Set-Cookie: sessionId=abc123</code></pre>
+      <h3>Usando headers com Fetch:</h3>
+      <pre><code>fetch("https://api.exemplo.com/livros", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer seu_token_aqui"
+  },
+  body: JSON.stringify({ titulo: "JavaScript Moderno" })
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>Content-Type: tipos de dados</h2>
+      <p>
+        O header <strong><code>Content-Type</code></strong> indica o formato dos dados
+        sendo enviados ou recebidos:
+      </p>
+      <ul>
+        <li><code>application/json</code> — JSON (mais comum em APIs modernas)</li>
+        <li><code>application/x-www-form-urlencoded</code> — Formulários HTML</li>
+        <li><code>text/html</code> — HTML puro</li>
+        <li><code>text/plain</code> — Texto simples</li>
+        <li><code>multipart/form-data</code> — Upload de arquivos</li>
+      </ul>
+      <p>
+        Para seu PDI, você principalmente usará <code>application/json</code> ao trabalhar
+        com a Faker API.
+      </p>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>HTTP é o protocolo das requisições na web;</li>
+        <li>URL identifica o recurso; path é a parte do recurso na URL;</li>
+        <li>Methods (GET, POST, PUT, DELETE) indicam a ação;</li>
+        <li>Status codes (200, 404, 500) indicam o resultado;</li>
+        <li>Headers transmitem metadados — Content-Type é crucial;</li>
+        <li>Sempre verificar <code>response.ok</code> antes de processar dados.</li>
+      </ul>
+    </section>
+
+    <footer>
+      PDI Front — Conceitos de HTTP. Esses conhecimentos são essenciais!
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Async / Await — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Async / Await</h1>
+    <p class="subtitle">
+      Sintaxe moderna para código assíncrono — deixando as Promises mais legíveis.
+    </p>
+
+    <section>
+      <h2>O que é Async / Await?</h2>
+      <p>
+        <strong><code>async</code></strong> e <strong><code>await</code></strong> são palavras-chave
+        do JavaScript (ES2017+) que permitem escrever código assíncrono de forma síncrona,
+        mantendo a legibilidade. Elas funcionam com <strong>Promises</strong> por debaixo dos panos.
+      </p>
+      <p>
+        Ao invés de usar <code>.then()</code> e <code>.catch()</code>, você escreve
+        como se estivesse esperando o resultado de forma linear:
+      </p>
+      <div class="card">
+        <strong>Evolução no seu PDI:</strong> XHR puro → jQuery → Fetch →
+        <strong>Async/Await</strong> (topo da pirâmide de abstração).
+      </div>
+    </section>
+
+    <section>
+      <h2>Declarando uma função <code>async</code></h2>
+      <p>
+        Uma função <strong><code>async</code></strong> sempre retorna uma
+        <strong>Promise</strong>, mesmo que você não escreva explicitamente:
+      </p>
+      <pre><code>// Função async simples
+async function buscarLivro() {
+  return { titulo: "Clean Code", autor: "Robert Martin" };
+}
+
+buscarLivro().then(livro => console.log(livro));</code></pre>
+      <p>
+        Neste exemplo, <code>buscarLivro()</code> retorna uma Promise resolvida com o objeto livro.
+      </p>
+    </section>
+
+    <section>
+      <h2>Usando <code>await</code> dentro de <code>async</code></h2>
+      <p>
+        Dentro de uma função <strong><code>async</code></strong>, você usa
+        <strong><code>await</code></strong> para "pausar" a execução até que a Promise
+        seja resolvida:
+      </p>
+      <pre><code>// Fetch com Promises (antiga forma)
+fetch("https://api.exemplo.com/livros/1")
+  .then(response => response.json())
+  .then(livro => console.log(livro));
+
+// Mesmo código com async/await (nova forma)
+async function buscarLivroModerno() {
+  const response = await fetch("https://api.exemplo.com/livros/1");
+  const livro = await response.json();
+  console.log(livro);
+}
+
+buscarLivroModerno();</code></pre>
+      <p>
+        Note: <code>await</code> só funciona <strong>dentro</strong> de uma função
+        <code>async</code>. Tentar usar em escopo global dará erro.
+      </p>
+    </section>
+
+    <section>
+      <h2>Tratamento de erros com <code>try / catch</code></h2>
+      <p>
+        Em vez de <code>.catch()</code>, use o bloco <strong><code>try/catch</code></strong>
+        tradicional:
+      </p>
+      <pre><code>async function buscarLivroComErro() {
+  try {
+    const response = await fetch("https://api.exemplo.com/livros/1");
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const livro = await response.json();
+    console.log("Sucesso:", livro);
+  } catch (erro) {
+    console.error("Erro:", erro.message);
+  }
+}
+
+buscarLivroComErro();</code></pre>
+      <p>
+        <strong>Dica:</strong> O <code>try/catch</code> é mais parecido com código síncrono,
+        facilitando o entendimento para quem vem de outras linguagens.
+      </p>
+    </section>
+
+    <section>
+      <h2>POST com Async/Await</h2>
+      <pre><code>async function criarLivro(titulo, autor) {
+  try {
+    const response = await fetch("https://api.exemplo.com/livros", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ titulo, autor })
+    });
+    const novoLivro = await response.json();
+    console.log("Livro criado:", novoLivro);
+    return novoLivro;
+  } catch (erro) {
+    console.error("Falha ao criar:", erro);
+  }
+}
+
+criarLivro("O Programador Pragmático", "David Thomas");</code></pre>
+    </section>
+
+    <section>
+      <h2>Aguardando múltiplas Promises</h2>
+      <p>
+        Use <strong><code>Promise.all()</code></strong> para aguardar várias requisições
+        em paralelo:
+      </p>
+      <pre><code>async function buscarVariosLivros() {
+  try {
+    // Fazer 3 requisições em paralelo
+    const promises = [
+      fetch("https://api.exemplo.com/livros/1").then(r => r.json()),
+      fetch("https://api.exemplo.com/livros/2").then(r => r.json()),
+      fetch("https://api.exemplo.com/livros/3").then(r => r.json())
+    ];
+    
+    const [livro1, livro2, livro3] = await Promise.all(promises);
+    console.log(livro1, livro2, livro3);
+  } catch (erro) {
+    console.error("Erro:", erro);
+  }
+}
+
+buscarVariosLivros();</code></pre>
+      <p>
+        <strong><code>Promise.all()</code></strong> resolve só quando <strong>todas</strong>
+        as Promises forem resolvidas. Se uma falhar, o catch captura.
+      </p>
+    </section>
+
+    <section>
+      <h2>Comparação: Promises vs Async/Await</h2>
+      <table class="tabela-comparacao" style="width: 100%; border-collapse: collapse;">
+        <tr style="background-color: #f0f0f0;">
+          <th style="padding: 8px; border: 1px solid #ccc;">Aspecto</th>
+          <th style="padding: 8px; border: 1px solid #ccc;">Promises (.then)</th>
+          <th style="padding: 8px; border: 1px solid #ccc;">Async/Await</th>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;">Declaração</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>function</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>async function</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;">Aguardar resultado</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>.then()</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>await</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;">Tratamento de erro</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>.catch()</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>try/catch</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;">Legibilidade</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Encadeamentos (callback hell)</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Linear, parecida com síncrono</td>
+        </tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Exemplo prático completo</h2>
+      <pre><code>// Simular uma API que retorna livros
+function fetchFakerAPI() {
+  return fetch("https://fakerapi.it/api/v1/books")
+    .then(r => r.json());
+}
+
+// Usar async/await para consumir a API
+async function exibirLivros() {
+  try {
+    console.log("Carregando livros...");
+    const dados = await fetchFakerAPI();
+    console.log(`Total de livros: ${dados.data.length}`);
+    dados.data.forEach((livro, index) => {
+      console.log(`${index + 1}. ${livro.title} — ${livro.author}`);
+    });
+  } catch (erro) {
+    console.error("Erro ao carregar:", erro.message);
+  }
+}
+
+exibirLivros();</code></pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li><strong>async</strong> declara uma função que retorna Promise;</li>
+        <li><strong>await</strong> pausa a execução até a Promise resolver (só dentro de async);</li>
+        <li><strong>try/catch</strong> trata erros de forma mais legível;</li>
+        <li>Código com async/await é mais fácil de ler e mantém;</li>
+        <li>Ainda usa Promises por baixo — é apenas açúcar sintático.</li>
+      </ul>
+    </section>
+
+    <footer>
+      PDI Front — Async/await. Pratique nos exemplos acima!
+    </footer>
+  </main>
+</body>
+</html>

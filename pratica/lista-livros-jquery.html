@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prática — Lista de livros XHR</title>
+    <title>Prática — Lista de livros refatoração com jQuery</title>
     <link rel="stylesheet" href="../estilos.css">
 </head>
 
@@ -12,20 +12,21 @@
     <main>
         <a class="voltar" href="../index.html">← Voltar ao índice</a>
 
-        <h1>Prática: lista de livros com XHR</h1>
+        <h1>Prática: lista de livros com jQuery</h1>
         <p class="subtitle">
-            Estrutura base para implementar sua requisição <code>XMLHttpRequest</code>.
+            Estrutura base para implementar sua requisição <code>$.ajax()</code>.
         </p>
 
         <section>
             <h2>O que você vai fazer</h2>
             <p>
-                Crie uma requisição XHR para buscar livros de uma API e mostrar os resultados na tela.
-                A base abaixo já inclui o botão, a área de carregamento e o lugar para renderizar os livros.
+                Abstraia a requisição XHR usando jQuery — troque o código de XHR puro por 
+                <code>$.ajax()</code> ou <code>$.get()</code>.
             </p>
             <ul>
-                <li>Use <code>XMLHttpRequest</code> com <code>open()</code>, <code>send()</code> e callbacks.</li>
-                <li>Trate sucesso e erro.</li>
+                <li>use <code>$.get()</code> para requisições GET simples.</li>
+                <li>Use <code>$.ajax()</code> para mais controle sobre a requisição.</li>
+                <li>Trate sucesso e erro com callbacks ou Promises.</li>
                 <li>Mostre um estado de carregamento enquanto a requisição está em andamento.</li>
             </ul>
         </section>
@@ -45,11 +46,12 @@
             </p>
         </section>
 
-        <footer>PDI Front — Prática 1: lista de livros XHR</footer>
+        <footer>PDI Front — Prática 1: lista de livros com jQuery</footer>
     </main>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        const API_URL = "https://fakerapi.it/api/v1/books?_quantity=10";
+        const API_URL = "https://fakerapi.it/api/v1/books?_quantity=100";
         const btnCarregar = document.getElementById("btn-carregar");
         const status = document.getElementById("status");
         const listaLivros = document.getElementById("lista-livros");
@@ -61,29 +63,20 @@
             limparLista();
             btnCarregar.disabled = true;
 
-            const xhr = new XMLHttpRequest();
-
-            xhr.open("GET", API_URL, true);
-
-            xhr.onload = function () {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    const dados = JSON.parse(xhr.responseText);
-                    console.log(dados.data);
-                    console.log(Array.isArray(dados.data));
-                    renderizarLivros(dados.data)
-                    atualizarStatus("Livros carregados com sucesso.");
-                } else {
-                    console.error("Erro HTTP:", xhr.status);
+            $.ajax({
+                url: API_URL,
+                method: "GET",
+                dataType: "json",
+                success: function (livros) {
+                    console.log(livros.data);
+                    renderizarLivros(livros.data)
+                    atualizarStatus("Livros carregados com sucesso")
+                },
+                error: function (xhr, status, erro) {
+                    console.error("Erro:", status, erro);
                     atualizarStatus("Erro ao carregar livros.");
                 }
-            };
-
-            xhr.onerror = function () {
-                console.error("Falha de rede ou CORS");
-                atualizarStatus("Falha na requisição. Verifique a conexão ou CORS.");
-            };
-
-            xhr.send(); // GET não envia corpo'
+            });
         }
 
         function renderizarLivros(livros) {

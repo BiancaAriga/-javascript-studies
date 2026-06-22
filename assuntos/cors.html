@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORS — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>CORS</h1>
+    <p class="subtitle">
+      Quando ocorre o erro CORS e como resolver — entendendo a política same-origin.
+    </p>
+
+    <section>
+      <h2>O que é CORS?</h2>
+      <p>
+        <strong>CORS</strong> (Cross-Origin Resource Sharing) é um mecanismo de segurança
+        do navegador que <strong>restringe requisições HTTP</strong> entre domínios diferentes.
+      </p>
+      <p>
+        Quando você faz uma requisição AJAX, Fetch ou jQuery para um domínio diferente
+        do seu site, o navegador bloqueia a resposta se o servidor não permitir explicitamente.
+      </p>
+      <div class="card">
+        <strong>Importante:</strong> CORS é uma <strong>política do navegador</strong>,
+        não do JavaScript. Ferramentas como Postman ou cURL <strong>não</strong> sofrem com isso.
+      </div>
+    </section>
+
+    <section>
+      <h2>Same-Origin Policy</h2>
+      <p>
+        Antes de CORS, existia a <strong>Same-Origin Policy</strong>: "só podes fazer
+        requisições para a mesma origem". Duas URLs têm a <strong>mesma origem</strong> se
+        compartilham <strong>protocolo, domínio e porta</strong>.
+      </p>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background-color: #f0f0f0;">
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">URL</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Mesma origem?</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Motivo</th>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>https://exemplo.com</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">✓ SIM</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Mesmo domínio</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>https://api.exemplo.com</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">✗ NÃO</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Subdomínio diferente</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>http://exemplo.com</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">✗ NÃO</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Protocolo diferente (http vs https)</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>https://exemplo.com:8080</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">✗ NÃO</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Porta diferente</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>https://outro.com</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">✗ NÃO</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Domínio diferente</td>
+        </tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>O erro CORS</h2>
+      <p>
+        Quando você tenta fazer uma requisição para origem diferente <strong>sem permissão</strong>,
+        o navegador exibe um erro assim no console:
+      </p>
+      <pre><code>Access to XMLHttpRequest at 'https://api.outro.com/dados'
+from origin 'https://seu-site.com' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.</code></pre>
+      <p>
+        <strong>Importante:</strong> A requisição foi feita, mas o navegador <strong>bloqueou a resposta</strong>.
+        O servidor viu sua requisição, mas você não consegue ler a resposta.
+      </p>
+    </section>
+
+    <section>
+      <h2>Como CORS funciona</h2>
+      <p>
+        CORS usa <strong>headers HTTP</strong> para comunicar permissões:
+      </p>
+      <h3>1. Requisição (navegador manda):</h3>
+      <pre><code>GET /api/livros HTTP/1.1
+Host: api.outro.com
+Origin: https://seu-site.com
+<!-- Origin é ADICIONADO automaticamente pelo navegador --></code></pre>
+      <h3>2. Resposta (servidor deve mandar):</h3>
+      <pre><code>HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://seu-site.com
+Access-Control-Allow-Methods: GET, POST
+Access-Control-Allow-Headers: Content-Type
+Content-Type: application/json
+
+[{ "titulo": "Clean Code", "autor": "Robert Martin" }]</code></pre>
+      <p>
+        Se o servidor NÃO enviar <code>Access-Control-Allow-Origin</code>,
+        o navegador bloqueia o acesso aos dados.
+      </p>
+    </section>
+
+    <section>
+      <h2>Headers CORS importantes</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="background-color: #f0f0f0;">
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Header</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Descrição</th>
+          <th style="padding: 8px; border: 1px solid #ccc; text-align: left;">Exemplo</th>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>Access-Control-Allow-Origin</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Qual origem pode acessar?</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>*</code> (qualquer) ou <code>https://seu-site.com</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>Access-Control-Allow-Methods</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Quais métodos HTTP são permitidos?</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>GET, POST, PUT, DELETE</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>Access-Control-Allow-Headers</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Quais headers podem ser enviados?</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>Content-Type, Authorization</code></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>Access-Control-Max-Age</code></td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Por quanto tempo cachear o preflight?</td>
+          <td style="padding: 8px; border: 1px solid #ccc;"><code>86400</code> (24 horas em segundos)</td>
+        </tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Preflight Request</h2>
+      <p>
+        Quando você faz uma requisição "complexa" (POST, PATCH, DELETE, ou com headers customizados),
+        o navegador faz automaticamente um <strong>preflight request</strong> — uma requisição
+        <strong>OPTIONS</strong> antes da requisição real:
+      </p>
+      <pre><code>// Seu código:
+fetch("https://api.outro.com/livros", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ titulo: "Clean Code" })
+});
+
+// O navegador faz automaticamente:
+OPTIONS /livros HTTP/1.1
+Host: api.outro.com
+Origin: https://seu-site.com
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: content-type
+
+// Servidor responde:
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://seu-site.com
+Access-Control-Allow-Methods: POST
+Access-Control-Allow-Headers: content-type
+
+// DEPOIS a requisição real é feita...</code></pre>
+      <p>
+        <strong>Dica:</strong> Requisições GET simples NÃO fazem preflight — só requisições
+        "complexas" (POST, PUT, DELETE, custom headers).
+      </p>
+    </section>
+
+    <section>
+      <h2>Soluções para CORS</h2>
+      <h3>1. Pedir ao servidor para habilitar CORS</h3>
+      <p>
+        Se você controla o servidor, configure os headers CORS. Exemplos:
+      </p>
+      <p><strong>Node.js / Express:</strong></p>
+      <pre><code>const express = require('express');
+const cors = require('cors'); // npm install cors
+
+const app = express();
+app.use(cors()); // Permite CORS de qualquer origem
+
+// Ou mais específico:
+app.use(cors({
+  origin: 'https://seu-site.com',
+  methods: ['GET', 'POST']
+}));</code></pre>
+      <p><strong>Python / Flask:</strong></p>
+      <pre><code>from flask_cors import CORS
+from flask import Flask
+
+app = Flask(__name__)
+CORS(app)  # Permite CORS</code></pre>
+
+      <h3>2. Se NÃO controla o servidor: usar um proxy</h3>
+      <p>
+        Se o servidor não permite CORS e você não consegue mudar isso,
+        crie um <strong>servidor proxy</strong> seu que:
+      </p>
+      <ul>
+        <li>Recebe requisições do seu site;</li>
+        <li>Passa adiante para o servidor remoto (não há bloqueio servidor-para-servidor);</li>
+        <li>Devolve a resposta com headers CORS.</li>
+      </ul>
+      <pre><code>// Ao invés de:
+fetch("https://api.outro.com/dados")
+
+// Use:
+fetch("/api-proxy/dados")  // Seu próprio servidor passa adiante</code></pre>
+
+      <h3>3. JSONP (método antigo — menos recomendado)</h3>
+      <p>
+        <strong>JSONP</strong> (JSON with Padding) funciona contornando CORS usando
+        <code>&lt;script&gt;</code> tags, que não sofrem restrições de origem.
+        Raramente usado em APIs modernas.
+      </p>
+    </section>
+
+    <section>
+      <h2>Na prática: Faker API</h2>
+      <p>
+        A <strong>Faker API</strong> que você usa no seu PDI
+        <strong>já habilita CORS</strong> — ela envia:
+      </p>
+      <pre><code>Access-Control-Allow-Origin: *</code></pre>
+      <p>
+        Isso significa que <strong>qualquer site pode acessar</strong> — perfeito para aprender!
+      </p>
+      <pre><code>// Isso funciona sem problemas:
+fetch("https://fakerapi.it/api/v1/books")
+  .then(r => r.json())
+  .then(dados => console.log(dados));</code></pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>CORS é uma política de segurança do navegador;</li>
+        <li>Requisições cross-origin são bloqueadas a menos que o servidor permita;</li>
+        <li>O servidor comunica permissão via headers como <code>Access-Control-Allow-Origin</code>;</li>
+        <li>Requisições "complexas" (POST, custom headers) fazem preflight automaticamente;</li>
+        <li>Soluções: habilitar CORS no servidor, usar proxy, ou aceitar a restrição;</li>
+        <li>Faker API já permite CORS — sem problemas para seu PDI.</li>
+      </ul>
+    </section>
+
+    <footer>
+      PDI Front — CORS. Você entenderá isso melhor quando conectar a APIs externas!
+    </footer>
+  </main>
+</body>
+</html>
