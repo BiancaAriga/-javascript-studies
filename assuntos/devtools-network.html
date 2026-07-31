@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevTools — aba Network</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>DevTools — aba Network</h1>
+    <p class="subtitle">
+      Inspecionar requisições HTTP e entender como o navegador carrega recursos.
+    </p>
+
+    <section>
+      <h2>O que é a aba Network?</h2>
+      <p>
+        A aba <strong>Network</strong> do DevTools mostra todas as requisições que o navegador faz
+        ao carregar uma página. Isso inclui HTML, CSS, JavaScript, imagens, fontes e chamadas de API.
+      </p>
+      <p>
+        É uma ferramenta essencial para depurar problemas de rede, analisar desempenho e verificar
+        erros de requisição.
+      </p>
+    </section>
+
+    <section>
+      <h2>Como abrir a aba Network</h2>
+      <ul>
+        <li><strong>Chrome / Edge:</strong> Ctrl+Shift+I ou F12 e clique em "Network".</li>
+        <li><strong>Firefox:</strong> Ctrl+Shift+E ou F12 e selecione "Network".</li>
+      </ul>
+      <p>
+        Após abrir, recarregue a página para ver todas as requisições feitas no carregamento inicial.
+      </p>
+    </section>
+
+    <section>
+      <h2>O que cada coluna significa</h2>
+      <ul>
+        <li><strong>Name:</strong> nome do recurso ou endpoint.</li>
+        <li><strong>Status:</strong> código HTTP retornado (200, 404, 500 etc.).</li>
+        <li><strong>Type:</strong> tipo de recurso (document, script, xhr, fetch, image etc.).</li>
+        <li><strong>Initiator:</strong> o que iniciou a requisição — HTML, script ou outro recurso.</li>
+        <li><strong>Size:</strong> tamanho do recurso transferido.</li>
+        <li><strong>Time:</strong> tempo total gasto na requisição.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Filtros úteis</h2>
+      <p>
+        Use os filtros para encontrar rapidamente requisições específicas:
+      </p>
+      <ul>
+        <li><strong>All:</strong> todas as requisições.</li>
+        <li><strong>XHR / Fetch:</strong> chamadas de API feitas por JavaScript.</li>
+        <li><strong>JS:</strong> arquivos JavaScript.</li>
+        <li><strong>CSS:</strong> arquivos de estilo.</li>
+        <li><strong>Img:</strong> imagens.</li>
+      </ul>
+      <p>
+        O filtro <strong>XHR / Fetch</strong> é especialmente útil quando você quer depurar APIs e
+        requisições AJAX.</p>
+    </section>
+
+    <section>
+      <h2>Inspecionar uma requisição</h2>
+      <p>
+        Clique em uma linha para ver detalhes da requisição. As abas comuns são:
+      </p>
+      <ul>
+        <li><strong>Headers:</strong> mostra a URL, método, status e cabeçalhos enviados e recebidos.</li>
+        <li><strong>Preview / Response:</strong> mostra o corpo da resposta em formato legível.</li>
+        <li><strong>Timing:</strong> divide o tempo gasto em DNS, conexão, envio, espera e recebimento.</li>
+        <li><strong>Cookies:</strong> mostra cookies enviados e recebidos.</li>
+      </ul>
+      <p>
+        <strong>DNS</strong> é o sistema que traduz um nome de domínio, como <code>api.exemplo.com</code>,
+        em um endereço IP que o navegador usa para conectar ao servidor. Sem DNS, só seria possível
+        acessar o site usando números, não nomes fáceis de lembrar.
+      </p>
+      <p>
+        Esses detalhes ajudam a identificar se o erro está na URL, no método, no corpo da requisição,
+        nos cabeçalhos ou no próprio servidor.
+      </p>
+    </section>
+
+    <section>
+      <h2>Erros comuns</h2>
+      <ul>
+        <li><strong>404 Not Found:</strong> recurso não existe ou URL está errada.</li>
+        <li><strong>401 / 403:</strong> problema de autorização ou autenticação.</li>
+        <li><strong>500:</strong> erro no servidor.</li>
+        <li><strong>CORS:</strong> se a aba Network mostrar bloqueio no console, o servidor não autorizou
+          a origem da requisição.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Verificar payload e headers</h2>
+      <p>
+        Em requisições POST, PUT, PATCH e DELETE, o DevTools mostra o corpo enviado pelo navegador.
+        Isso é útil para garantir que o JSON ou formulário está correto.
+      </p>
+      <p>
+        Em <strong>Headers</strong>, preste atenção em:
+      </p>
+      <ul>
+        <li><strong>Content-Type:</strong> tipo de dado enviado (application/json, application/x-www-form-urlencoded, multipart/form-data).</li>
+        <li><strong>Authorization:</strong> token ou credenciais.</li>
+        <li><strong>Accept:</strong> formatos aceitos de resposta.</li>
+      </ul>
+      <p>
+        Esses formatos significam:
+      </p>
+      <ul>
+        <li><strong>application/json:</strong> corpo em JSON. É o mais comum para APIs modernas, com dados estruturados como objetos e arrays.</li>
+        <li><strong>application/x-www-form-urlencoded:</strong> dados em pares chave=valor codificados na URL, como em formulários HTML simples.</li>
+        <li><strong>multipart/form-data:</strong> usado para upload de arquivos e dados mistos, onde cada campo é enviado em uma parte separada.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Dicas para usar a aba Network</h2>
+      <ul>
+        <li>Marque <strong>Preserve log</strong> para manter as requisições ao navegar ou recarregar.</li>
+        <li>Use <strong>Disable cache</strong> para evitar respostas em cache enquanto depura.</li>
+        <li>Em APIs, filtre por <strong>XHR</strong> ou <strong>fetch</strong> para encontrar apenas chamadas de dados.</li>
+        <li>Compare os dados enviados e recebidos para encontrar inconsistências.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>A aba Network mostra todas as requisições e ajuda a depurar HTTP no navegador.</li>
+        <li>Verifique método, URL, status, headers, payload e resposta.</li>
+        <li>Filtros como XHR/Fetch facilitam a análise de APIs.</li>
+        <li>Timing e tamanho ajudam a identificar problemas de desempenho.</li>
+      </ul>
+    </section>
+
+    <footer>PDI Front — DevTools Network</footer>
+  </main>
+</body>
+</html>

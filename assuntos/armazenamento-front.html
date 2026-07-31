@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Armazenamento no front-end — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Armazenamento no front-end</h1>
+    <p class="subtitle">
+      Aprenda a usar Local Storage e Session Storage para guardar dados no navegador.
+    </p>
+
+    <section>
+      <h2>Por que usar armazenamento no navegador?</h2>
+      <p>
+        O armazenamento no front-end permite guardar dados entre páginas ou sessões sem precisar de servidor.
+        É útil para manter preferências do usuário, formulários parcialmente preenchidos ou dados temporários.
+      </p>
+    </section>
+
+    <section>
+      <h2>Session Storage</h2>
+      <p>
+        O <code>sessionStorage</code> armazena dados apenas enquanto a aba ou janela do navegador estiver aberta.
+        Quando a aba é fechada, os dados somem.
+      </p>
+      <pre><code>sessionStorage.setItem('nome', 'Ana');
+const nome = sessionStorage.getItem('nome');
+console.log(nome); // 'Ana'
+sessionStorage.removeItem('nome');
+sessionStorage.clear();</code></pre>
+      <p>
+        O <code>sessionStorage</code> é limitado à mesma origem e não compartilha dados entre domínios.
+        Mesmo entre abas do mesmo site, cada aba/janela tem seu próprio <code>sessionStorage</code>.
+      </p>
+      <p>
+        Use <code>sessionStorage</code> quando precisar de dados temporários que não devem persistir após o fim da sessão.
+      </p>
+    </section>
+
+    <section>
+      <h2>Local Storage</h2>
+      <p>
+        O <code>localStorage</code> persiste os dados mesmo depois de fechar e reabrir o navegador.
+        Ele fica disponível para o mesmo domínio e não expira automaticamente.
+      </p>
+      <pre><code>localStorage.setItem('tema', 'escuro');
+const tema = localStorage.getItem('tema');
+console.log(tema); // 'escuro'
+localStorage.removeItem('tema');
+localStorage.clear();</code></pre>
+      <p>
+        O <code>localStorage</code> mantém os dados até que você remova explicitamente com <code>localStorage.removeItem()</code>
+        ou <code>localStorage.clear()</code>, ou até que o usuário/navegador limpe os dados.
+      </p>
+      <p>
+        Use <code>localStorage</code> para preferências do usuário, dados de interface ou qualquer informação que precise ficar salva.
+      </p>
+    </section>
+
+    <section>
+      <h2>Armazenando objetos com JSON</h2>
+      <p>
+        <code>localStorage</code> e <code>sessionStorage</code> só guardam strings. Para salvar objetos, converta com <code>JSON.stringify</code> e leia com <code>JSON.parse</code>.
+      </p>
+      <pre><code>const livro = { titulo: 'JavaScript para Iniciantes', ano: 2024 };
+localStorage.setItem('livro', JSON.stringify(livro));
+
+const livroSalvo = JSON.parse(localStorage.getItem('livro'));
+console.log(livroSalvo.titulo);
+</code></pre>
+    </section>
+
+    <section>
+      <h2>Comparação entre sessionStorage, localStorage e cookies</h2>
+      <p>Veja quando usar cada tipo de armazenamento no front-end:</p>
+      <table style="width:100%; border-collapse: collapse;">
+        <tr style="background: #f0f0f0;">
+          <th style="padding: 10px; border: 1px solid #ccc; text-align:left;">Armazenamento</th>
+          <th style="padding: 10px; border: 1px solid #ccc; text-align:left;">Duração</th>
+          <th style="padding: 10px; border: 1px solid #ccc; text-align:left;">Escopo</th>
+          <th style="padding: 10px; border: 1px solid #ccc; text-align:left;">Quando usar</th>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ccc;"><strong>sessionStorage</strong></td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Até fechar a aba/janela</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Mesmo domínio + mesma aba/janela</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Dados temporários da sessão atual</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ccc;"><strong>localStorage</strong></td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Persistente até ser removido</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Mesmo domínio</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Preferências e dados que devem persistir</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ccc;"><strong>Cookies</strong></td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Expira conforme atributo `max-age`/`expires`</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Mesmo domínio (ou subdomínios se permitido)</td>
+          <td style="padding: 10px; border: 1px solid #ccc;">Dados que o servidor precisa receber automaticamente</td>
+        </tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Cookies</h2>
+      <p>
+        Cookies são pequenos arquivos de texto que o navegador armazena e envia automaticamente ao servidor em cada requisição.
+        Eles são usados para guardar preferências, sessões de usuário e informações que precisam ser lidas pelo servidor.
+      </p>
+      <pre><code>document.cookie = 'tema=escuro; max-age=3600; path=/';
+const cookies = document.cookie;
+console.log(cookies);</code></pre>
+      <p>
+        Um cookie tem formato <code>nome=valor</code> e pode incluir atributos como <code>max-age</code>, <code>expires</code>, <code>path</code> e <code>secure</code>.
+      </p>
+      <pre><code>document.cookie = 'usuario=Ana; max-age=86400; path=/; secure';</code></pre>
+      <p>
+        <strong><code>max-age</code></strong> define quanto tempo o cookie fica válido em segundos.
+        No exemplo acima, o cookie expira após 86400 segundos (24 horas).
+      </p>
+      <p>
+        <strong><code>expires</code></strong> define uma data e hora exata de expiração. Ele funciona como alternativa a <code>max-age</code>.
+        Por exemplo: <code>expires=Tue, 19 Jan 2038 03:14:07 GMT</code>.
+      </p>
+      <p>
+        <strong><code>path</code></strong> define o caminho do site onde o cookie está disponível.
+        Com <code>path=/</code>, o cookie é enviado em requisições para todas as páginas do site.
+      </p>
+      <p>
+        <strong><code>secure</code></strong> só envia o cookie em conexões HTTPS.
+        Use quando o cookie contiver dados sensíveis e você quiser evitar envio em conexões inseguras.
+      </p>
+      <p>
+        O cookie fica disponível para o mesmo domínio e para o caminho definido em <code>path</code>.
+      </p>
+      <p>
+        Se você quiser compartilhar cookies entre subdomínios, use o atributo <code>domain</code>, por exemplo
+        <code>domain=.example.com</code>. Isso faz o cookie funcionar em <code>example.com</code>,
+        <code>app.example.com</code> e <code>blog.example.com</code>.
+      </p>
+      <p>
+        Sem o atributo <code>domain</code>, o cookie é <em>host-only</em> e só vale para o host exato onde foi criado.
+      </p>
+    </section>
+
+    <section>
+      <h2>Exemplo prático</h2>
+      <p>
+        O exemplo abaixo mostra como salvar o nome do usuário, carregar o valor ao abrir a página e limpar o armazenamento.
+      </p>
+      <button id="btn-salvar">Salvar nome</button>
+      <button id="btn-limpar">Limpar nome</button>
+      <p id="mensagem"></p>
+    </section>
+  </main>
+
+  <script>
+    const btnSalvar = document.getElementById('btn-salvar');
+    const btnLimpar = document.getElementById('btn-limpar');
+    const mensagem = document.getElementById('mensagem');
+
+    function carregarNome() {
+      const nome = localStorage.getItem('nomeUsuario');
+      mensagem.textContent = nome
+        ? `Bem-vindo de volta, ${nome}!` 
+        : 'Nenhum nome salvo ainda.';
+    }
+
+    btnSalvar.addEventListener('click', () => {
+      const nome = prompt('Digite seu nome:');
+      if (nome) {
+        localStorage.setItem('nomeUsuario', nome);
+        carregarNome();
+      }
+    });
+
+    btnLimpar.addEventListener('click', () => {
+      localStorage.removeItem('nomeUsuario');
+      carregarNome();
+    });
+
+    carregarNome();
+  </script>
+</body>
+</html>

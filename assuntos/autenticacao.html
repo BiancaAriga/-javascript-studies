@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autenticação — Headers Authorization</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Autenticação</h1>
+    <p class="subtitle">
+      Entenda como usar o header <code>Authorization</code> para autenticar requisições HTTP.
+    </p>
+
+    <section>
+      <h2>O que é o header Authorization?</h2>
+      <p>
+        O header <code>Authorization</code> é enviado em requisições HTTP para informar credenciais ao servidor.
+        Ele é usado quando o servidor protege recursos e exige autenticação.
+      </p>
+    </section>
+
+    <section>
+      <h2>Basic Authentication</h2>
+      <p>
+        A autenticação básica envia usuário e senha codificados em Base64.
+        O formato é <code>Authorization: Basic base64(usuario:senha)</code>.
+      </p>
+      <p>
+        Base64 é uma forma de codificar dados em texto seguro usando 64 caracteres imprimíveis.
+        No JavaScript, a função <code>btoa()</code> converte uma string em Base64.
+      </p>
+      <pre><code>const usuario = 'ana';
+const senha = '123456';
+const token = btoa(`${usuario}:${senha}`);
+
+fetch('https://api.exemplo.com/login', {
+  headers: {
+    'Authorization': `Basic ${token}`
+  }
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>Bearer Token</h2>
+      <p>
+        O tipo mais comum em APIs REST modernas é o <code>Bearer Token</code>.
+        Ele envia um token de acesso que o servidor valida.
+      </p>
+      <p>
+        Um JWT (JSON Web Token) é um token compacto e seguro que carrega informações em três partes:
+        header, payload e assinatura. Ele é usado para provar a identidade do usuário e transmitir dados de autorização.
+      </p>
+      <p>
+        Diferente do <code>Basic</code>, que usa <code>btoa(usuario:senha)</code>, o JWT não deve ser criado no cliente.
+        O servidor gera o JWT depois de verificar o login, assina o token com um segredo e devolve ao cliente.
+        O cliente apenas envia esse token no header <code>Authorization: Bearer ...</code>.
+      </p>
+      <pre><code>const token = 'seu.jwt.aqui';
+
+fetch('https://api.exemplo.com/perfil', {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+});</code></pre>
+    </section>
+
+    <section>
+      <h2>Quando usar cada tipo</h2>
+      <ul>
+        <li><strong>Basic:</strong> útil para autenticação simples ou em APIs legadas.</li>
+        <li><strong>Bearer:</strong> recomendado para tokens e autenticação moderna.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Exemplo prático com Fetch</h2>
+      <p>
+        Veja como enviar o token no header e tratar a resposta.
+      </p>
+      <pre><code>fetch('https://api.exemplo.com/dados', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer seu.jwt.aqui',
+    'Content-Type': 'application/json'
+  }
+})
+  .then(res => {
+    if (!res.ok) throw new Error('Não autorizado');
+    return res.json();
+  })
+  .then(data => console.log(data))
+  .catch(err => console.error(err));</code></pre>
+    </section>
+
+    <section>
+      <h2>Boas práticas</h2>
+      <ul>
+        <li>Não guarde tokens sensíveis em localStorage se o app puder ser atacado por XSS.</li>
+        <li>XSS (Cross-Site Scripting) é um ataque onde código malicioso é injetado e executado no navegador de outro usuário (vítima do ataque).</li>
+        <li>Use HTTPS sempre que enviar headers de autenticação.</li>
+        <li>Evite expor credenciais em URLs ou código público.</li>
+      </ul>
+    </section>
+
+    <footer>PDI Front — Autenticação e Headers Authorization</footer>
+  </main>
+</body>
+</html>

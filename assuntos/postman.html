@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Postman — Teste de APIs</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Postman</h1>
+    <p class="subtitle">
+      Uma ferramenta para testar requisições HTTP e trabalhar com APIs de forma visual.
+    </p>
+
+    <section>
+      <h2>O que é o Postman?</h2>
+      <p>
+        O Postman é um aplicativo usado para criar, testar e organizar requisições HTTP.
+        Ele facilita enviar solicitações GET, POST, PUT, DELETE e ver as respostas.
+      </p>
+    </section>
+
+    <section>
+      <h2>Por que usar?</h2>
+      <ul>
+        <li>Testar APIs sem precisar escrever código.</li>
+        <li>Salvar requisições e reutilizar headers, corpo e parâmetros.</li>
+        <li>Visualizar respostas em JSON, XML ou texto.</li>
+        <li>Trabalhar com autenticação, variáveis e coleções.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Solicitação básica</h2>
+      <p>
+        No Postman, você escolhe o método HTTP, coloca a URL e adiciona headers ou corpo.
+      </p>
+      <pre><code>GET https://api.exemplo.com/usuarios
+Accept: application/json
+
+// Depois clique em Send para ver a resposta</code></pre>
+    </section>
+
+    <section>
+      <h2>Autenticação</h2>
+      <p>
+        O Postman permite configurar autenticação básica, Bearer Token e outros tipos em cada requisição.
+        Isso é útil para testar endpoints protegidos por <code>Authorization</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Coleções e variáveis</h2>
+      <p>
+        Coleções agrupam várias requisições relacionadas. Variáveis tornam mais fácil trocar URLs, headers, tokens e outros dados sem precisar editar cada requisição.
+      </p>
+      <p>
+        No Postman, você pode criar variáveis em diferentes escopos:
+      </p>
+      <ul>
+        <li><strong>Global:</strong> disponíveis em qualquer requisição do Postman.</li>
+        <li><strong>Collection:</strong> disponíveis apenas nas requisições dentro de uma coleção.</li>
+        <li><strong>Environment:</strong> úteis para alternar entre ambientes como desenvolvimento, teste e produção.</li>
+        <li><strong>Local:</strong> usadas somente na requisição atual.</li>
+      </ul>
+      <p>
+        Para usar uma variável, escreva o nome entre chaves duplas: <code>{{nome_da_variavel}}</code>.
+      </p>
+      <pre><code>{{base_url}}/login
+Authorization: Bearer {{token}}</code></pre>
+      <p>
+        Exemplo: se <code>{{base_url}}</code> for <code>https://api.exemplo.com</code> e <code>{{token}}</code> for <code>abc123</code>, o Postman envia:
+      </p>
+      <pre><code>GET https://api.exemplo.com/login
+Authorization: Bearer abc123</code></pre>
+      <p>
+        Variáveis de ambiente são especialmente úteis para mudar de um ambiente para outro sem alterar a URL ou token manualmente.
+      </p>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <p>
+        Use o Postman para testar APIs durante o desenvolvimento, validar respostas e preparar requisições antes de implementar o código.
+      </p>
+    </section>
+
+    <footer>PDI Front — Postman e teste de APIs</footer>
+  </main>
+</body>
+</html>

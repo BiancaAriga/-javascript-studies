@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classes e objetos — JavaScript</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+    <h1>Classes e objetos</h1>
+    <p class="subtitle">
+      Entenda a diferença entre objeto e classe em JavaScript e como usar a sintaxe moderna.
+    </p>
+
+    <section>
+      <h2>O que é um objeto?</h2>
+      <p>
+        Um objeto é uma coleção de pares <code>chave: valor</code> que representa dados e comportamento.
+        Objetos podem ter propriedades e métodos e são muito usados para modelar coisas no código.
+      </p>
+    </section>
+
+    <section>
+      <h2>O que é uma classe?</h2>
+      <p>
+        Uma classe é um molde para criar objetos com a mesma estrutura.
+        Ela define como os objetos serão construídos e quais métodos eles terão.
+      </p>
+    </section>
+
+    <section>
+      <h2>Exemplo de classe</h2>
+      <pre><code>class Pessoa {
+  constructor(nome, idade) {
+    this.nome = nome;
+    this.idade = idade;
+  }
+
+  apresentar() {
+    return `Olá, eu sou ${this.nome} e tenho ${this.idade} anos.`;
+  }
+}
+
+const ana = new Pessoa('Ana', 28);
+console.log(ana.apresentar());
+</code></pre>
+    </section>
+
+    <section>
+      <h2>Como criar objetos diretamente</h2>
+      <pre><code>const livro = {
+  titulo: 'JavaScript Básico',
+  autor: 'Maria',
+  paginas: 150,
+  ler() {
+    console.log(`Lendo ${this.titulo}`);
+  }
+};
+
+livro.ler();
+</code></pre>
+    </section>
+
+    <section>
+      <h2>Herança com classes</h2>
+      <p>
+        Com <code>extends</code>, uma classe pode herdar propriedades e métodos de outra classe.
+      </p>
+      <pre><code>class Animal {
+  constructor(nome) {
+    this.nome = nome;
+  }
+
+  falar() {
+    console.log(`${this.nome} faz um som.`);
+  }
+}
+
+class Cachorro extends Animal {
+  falar() {
+    console.log(`${this.nome} late.`);
+  }
+}
+
+const rex = new Cachorro('Rex');
+rex.falar();
+</code></pre>
+    </section>
+
+    <section>
+      <h2>Resumo</h2>
+      <ul>
+        <li>Objeto é uma estrutura de dados com propriedades e métodos.</li>
+        <li>Classe é um padrão para criar objetos semelhantes.</li>
+        <li><code>new</code> instancia um objeto a partir de uma classe.</li>
+        <li>Herança permite compartilhar comportamento entre classes.</li>
+      </ul>
+    </section>
+
+    <footer>PDI Front — Classes e objetos em JavaScript</footer>
+  </main>
+</body>
+</html>

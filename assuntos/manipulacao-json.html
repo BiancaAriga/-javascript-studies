@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manipulação de JSON — Meus estudos</title>
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <main>
+    <a class="voltar" href="../index.html">← Voltar ao índice</a>
+    <h1>Manipulação de JSON</h1>
+    <p>JSON (JavaScript Object Notation) é um formato leve para troca de dados. Em JavaScript, usamos <code>JSON.parse()</code> e <code>JSON.stringify()</code> para converter entre strings JSON e objetos.</p>
+
+    <section>
+      <h2>Parse — converter string JSON em objeto</h2>
+      <p>Use <code>JSON.parse()</code>. Envolva em <code>try/catch</code> porque a string pode ser inválida.</p>
+      <pre><code>const json = '{"titulo":"Livro A","ano":2020}';
+try {
+  const obj = JSON.parse(json);
+  console.log(obj.titulo); // "Livro A"
+} catch (e) {
+  console.error('JSON inválido', e);
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>Stringify — converter objeto em string JSON</h2>
+      <p>Use <code>JSON.stringify()</code>. Você pode passar um <code>replacer</code> ou um valor de espaço para formatar a saída.</p>
+      <pre><code>const obj = { titulo: 'Livro A', ano: 2020 };
+const jsonStr = JSON.stringify(obj);
+const pretty = JSON.stringify(obj, null, 2); // null = sem replacer, 2 = indentação de 2 espaços
+console.log(pretty);
+</code></pre>
+      <p>O segundo parâmetro <code>null</code> diz para não filtrar ou transformar propriedades. O terceiro parâmetro <code>2</code> adiciona espaços para deixar o JSON mais legível.</p>
+    </section>
+
+    <section>
+      <h2>Trabalhando com respostas de API (fetch)</h2>
+      <p>Com <code>fetch</code>, chame <code>response.json()</code> para obter o body já convertido em objeto.</p>
+      <pre><code>fetch('https://fakerapi.it/api/v1/books?_quantity=5')
+  .then(response => {
+    if (!response.ok) throw new Error('Erro na resposta');
+    return response.json();
+  })
+  .then(data => {
+    console.log(data);
+  })
+  .catch(err => console.error(err));
+
+// Com async/await
+async function listar() {
+  try {
+    const res = await fetch('https://fakerapi.it/api/v1/books?_quantity=5');
+    if (!res.ok) throw new Error('Erro na requisição');
+    const json = await res.json();
+    console.log(json);
+  } catch (err) {
+    console.error(err);
+  }
+}
+listar();</code></pre>
+    </section>
+
+    <section>
+      <h2>Reviver e Replacer</h2>
+      <p>O <em>reviver</em> no <code>parse</code> permite transformar valores durante a conversão. O <em>replacer</em> no <code>stringify</code> permite filtrar ou modificar valores.</p>
+      <pre><code>// reviver: converte strings ISO para Date
+const s = '{"data":"2023-01-01T12:00:00.000Z"}';
+const obj = JSON.parse(s, (key, value) => {
+  if (key === 'data') return new Date(value);
+  return value;
+});
+console.log(obj.data instanceof Date); // true
+
+// replacer: remover campos antes de serializar
+const livro = { titulo: 'A', preco: 29.9, interno: true };
+const publicJson = JSON.stringify(livro, (k, v) => (k === 'interno' ? undefined : v));
+console.log(publicJson);
+</code></pre>
+    </section>
+
+    <section>
+      <h2>Boas práticas</h2>
+      <ul>
+        <li>Valide e trate erros ao parsear JSON.</li>
+        <li>Não confie em dados vindos do cliente. Faça validação do lado servidor.</li>
+        <li>Ao armazenar em LocalStorage/SessionStorage, armazene strings via <code>JSON.stringify</code>.</li>
+        <li>Evite serializar funções e referências circulares; o JSON só guarda dados, não código, e não entende objetos que se apontam.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Exercícios rápidos</h2>
+      <ol>
+        <li>Faça um <code>fetch</code> para a Faker API e mostre os títulos no console.</li>
+        <li>Implemente uma função segura <code>safeParse(json)</code> que retorna <code>null</code> em caso de erro.</li>
+        <li>Serializar um objeto removendo campos privados usando um <code>replacer</code>.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Por que funções e referências circulares não funcionam</h2>
+      <p>JSON não é um formato de código, é um formato de dados. Ele guarda apenas valores simples como strings, números, booleanos, arrays e objetos.</p>
+      <p>Funções não são gravadas em JSON. Se você tentar serializar um objeto com uma função, ela será ignorada:</p>
+      <pre><code>const obj = {
+  nome: 'Livro A',
+  imprimir: function () {
+    console.log(this.nome);
+  }
+};
+
+JSON.stringify(obj);
+// resultado: '{"nome":"Livro A"}'
+</code></pre>
+      <p>Referências circulares acontecem quando um objeto contém uma propriedade que aponta de volta para ele mesmo (direta ou indiretamente). Isso cria um loop que o JSON não consegue representar.</p>
+      <pre><code>const a = { nome: 'A' };
+const b = { nome: 'B', pai: a };
+a.filho = b;
+
+JSON.stringify(a);
+// TypeError: Converting circular structure to JSON
+</code></pre>
+      <p>Nesse caso, o objeto <code>a</code> referencia <code>b</code>, e <code>b</code> referencia <code>a</code>. O JSON não tem como colocar isso em uma string simples.</p>
+    </section>
+
+    <section>
+      <h2>Exemplo interativo</h2>
+      <p>Clique no botão para buscar um livro da Faker API e ver como o mesmo objeto pode ser convertido em JSON compacto e JSON formatado.</p>
+      <p>Se o navegador bloquear o <code>fetch</code> em arquivos locais ou se o site estiver offline, o exemplo seguirá usando um objeto local como fallback.</p>
+      <button id="btn-gerar-json">Buscar livro e exibir JSON</button>
+      <pre id="saida-console"></pre>
+    </section>
+  </main>
+
+  <script>
+    const botaoJson = document.getElementById('btn-gerar-json');
+    const saidaConsole = document.getElementById('saida-console');
+
+    function safeParse(json) {
+      try {
+        return JSON.parse(json);
+      } catch (error) {
+        return null;
+      }
+    }
+
+    botaoJson.addEventListener('click', async () => {
+      saidaConsole.textContent = 'Buscando dados...';
+      let livro;
+      let fallback = false;
+
+      try {
+        const response = await fetch('https://fakerapi.it/api/v1/books?_quantity=1');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const apiData = await response.json();
+        livro = apiData.data[0];
+      } catch (error) {
+        fallback = true;
+        livro = {
+          titulo: 'Livro A',
+          autor: 'Ana',
+          ano: 2020,
+          categorias: ['JavaScript', 'Front-end'],
+        };
+      }
+
+      const compact = JSON.stringify(livro);
+      const pretty = JSON.stringify(livro, null, 2);
+      const parsed = safeParse(pretty);
+
+      saidaConsole.textContent =
+        (fallback ? 'Falha no fetch; usando exemplo local.\n\n' : '') +
+        'Objeto original:' + '\n' + JSON.stringify(livro, null, 2) + '\n\n' +
+        'JSON compacto:' + '\n' + compact + '\n\n' +
+        'JSON formatado:' + '\n' + pretty + '\n\n' +
+        'Parse seguro:' + '\n' + (parsed ? JSON.stringify(parsed, null, 2) : 'Erro ao parsear');
+    });
+  </script>
+</body>
+</html>
