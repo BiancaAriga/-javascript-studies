@@ -40,7 +40,7 @@
             <h2>Observações</h2>
             <p>
                 A API sugerida é
-                <code>https://fakerapi.it/api/v1/books?_quantity=10</code>.
+                <code>https://openlibrary.org/search.json?q=romance&limit=15</code>.
                 Se preferir, use outra URL de API que retorne JSON.
             </p>
         </section>
@@ -49,7 +49,7 @@
     </main>
 
     <script>
-        const API_URL = "https://fakerapi.it/api/v1/books?_quantity=10";
+        const API_URL = "https://openlibrary.org/search.json?q=romance&limit=15";
         const btnCarregar = document.getElementById("btn-carregar");
         const status = document.getElementById("status");
         const listaLivros = document.getElementById("lista-livros");
@@ -68,9 +68,9 @@
             xhr.onload = function () {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     const dados = JSON.parse(xhr.responseText);
-                    console.log(dados.data);
-                    console.log(Array.isArray(dados.data));
-                    renderizarLivros(dados.data)
+                    console.log(dados.docs);
+                    console.log(Array.isArray(dados.docs));
+                    renderizarLivros(dados.docs);
                     atualizarStatus("Livros carregados com sucesso.");
                 } else {
                     console.error("Erro HTTP:", xhr.status);

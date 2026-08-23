@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prática — CRUD com Session Storage</title>
+    <link rel="stylesheet" href="../estilos.css">
+</head>
+
+<body>
+    <main>
+        <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+        <h1>Prática: CRUD com Session Storage</h1>
+        <p class="subtitle">
+            Estrutura base para praticar persistência de dados na sessão do navegador.
+        </p>
+
+        <section>
+            <h2>O que você vai fazer</h2>
+            <p>
+                A ideia desta prática é persistir uma lista de livros na sessão do navegador,
+                usando <code>sessionStorage</code> para armazenar, listar, atualizar e excluir itens.
+            </p>
+            <ul>
+                <li>Carregue livros da API ou use uma lista inicial.</li>
+                <li>Salve os dados no <code>sessionStorage</code>.</li>
+                <li>Crie operações de leitura, atualização e exclusão.</li>
+                <li>Mostre o estado da aplicação em tela.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Gerenciar livros</h2>
+
+            <form id="form-livro">
+                <label>
+                    Título:
+                    <input type="text" id="titulo" placeholder="Digite o título do livro">
+                </label>
+                <br><br>
+                <label>
+                    Autor:
+                    <input type="text" id="autor" placeholder="Digite o autor">
+                </label>
+                <br><br>
+                <button type="submit">Salvar livro</button>
+            </form>
+
+            <p id="status">Nenhum livro salvo ainda.</p>
+
+            <ul id="lista-livros" class="lista-livros"></ul>
+        </section>
+
+        <section>
+            <h2>Observações</h2>
+            <p>
+                Você pode usar uma API para buscar os livros e depois salvar no <code>sessionStorage</code>.
+                Também pode começar com uma lista local e evoluir a lógica.
+            </p>
+        </section>
+
+        <footer>PDI Front — Prática 6: CRUD com Session Storage</footer>
+    </main>
+
+    <script>
+        (() => {
+            const STORAGE_KEY = "livros-session";
+            const formLivro = document.getElementById("form-livro");
+            const tituloInput = document.getElementById("titulo");
+            const autorInput = document.getElementById("autor");
+            const status = document.getElementById("status");
+            const listaLivros = document.getElementById("lista-livros");
+
+            formLivro.addEventListener("submit", salvarLivro);
+
+            function salvarLivro(evento) {
+                evento.preventDefault();
+
+                const titulo = tituloInput.value.trim();
+                const autor = autorInput.value.trim();
+
+                if (!titulo || !autor) {
+                    atualizarStatus("Preencha título e autor antes de salvar.");
+                    return;
+                }
+
+                // Escreva aqui a lógica para adicionar o livro
+                // - ler os dados existentes do sessionStorage
+                // - criar um novo item com id, titulo e autor
+                // - salvar de volta no storage
+                // - renderizar a lista
+                // - limpar os campos do formulário
+
+                atualizarStatus("Livro salvo. Continue implementando o CRUD.");
+            }
+
+            function carregarLivros() {
+                // Leia os dados do sessionStorage
+                // Se existir, renderize a lista
+                // Se não existir, mostre uma mensagem inicial
+            }
+
+            function renderizarLivros(livros) {
+                if (!livros || livros.length === 0) {
+                    listaLivros.innerHTML = "<li>Nenhum livro cadastrado.</li>";
+                    return;
+                }
+
+                listaLivros.innerHTML = livros
+                    .map(function (livro) {
+                        return "<li>" +
+                            "<strong>" + (livro.titulo || "Sem título") + "</strong> — " +
+                            (livro.autor || "Autor desconhecido") +
+                            " <button type='button' data-id='" + livro.id + "'>Excluir</button>" +
+                            "</li>";
+                    })
+                    .join("");
+
+                // Você pode adicionar eventos para os botões de excluir aqui
+            }
+
+            function excluirLivro(id) {
+                // Implemente a lógica para remover um livro da lista
+                // e salvar a lista atualizada no sessionStorage
+            }
+
+            function atualizarStatus(mensagem) {
+                status.textContent = mensagem;
+            }
+
+            function limparFormulario() {
+                tituloInput.value = "";
+                autorInput.value = "";
+                tituloInput.focus();
+            }
+
+            carregarLivros();
+        })();
+    </script>
+</body>
+
+</html>

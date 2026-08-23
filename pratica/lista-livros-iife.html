@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prática — Lista de livros com IIFE</title>
+    <link rel="stylesheet" href="../estilos.css">
+</head>
+
+<body>
+    <main>
+        <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+        <h1>Prática: lista de livros com IIFE</h1>
+        <p class="subtitle">
+            Estrutura base para você isolar variáveis e evitar poluição do escopo global.
+        </p>
+
+        <section>
+            <h2>O que você vai fazer</h2>
+            <p>
+                Reaproveite a mesma ideia da lista de livros, mas encapsule o código em uma IIFE.
+                O objetivo é praticar escopo local e evitar que variáveis fiquem no ambiente global.
+            </p>
+            <ul>
+                <li>Crie uma IIFE para proteger as variáveis de uso global.</li>
+                <li>Use funções internas para carregar, renderizar e atualizar o status.</li>
+                <li>Evite expor elementos desnecessários para o escopo global.</li>
+            </ul>
+        </section>
+
+        <section>
+            <button type="button" id="btn-carregar">Carregar livros</button>
+            <p id="status">Clique em carregar para buscar os livros.</p>
+            <ul id="lista-livros" class="lista-livros"></ul>
+        </section>
+
+        <section>
+            <h2>Observações</h2>
+            <p>
+                Você pode usar a mesma API das etapas anteriores, por exemplo:
+                <code>https://openlibrary.org/search.json?q=romance&limit=15</code>.
+            </p>
+            <p>
+                A ideia é refatorar a lógica para ficar encapsulada dentro da IIFE.
+            </p>
+        </section>
+
+        <footer>PDI Front — Prática 5: lista de livros com IIFE</footer>
+    </main>
+
+    <script>
+        (() => {
+            const API_URL = "https://openlibrary.org/search.json?q=romance&limit=15";
+            const btnCarregar = document.getElementById("btn-carregar");
+            const status = document.getElementById("status");
+            const listaLivros = document.getElementById("lista-livros");
+
+            btnCarregar.addEventListener("click", carregarLivros);
+
+            function carregarLivros() {
+                atualizarStatus("Carregando livros...");
+                limparLista();
+                btnCarregar.disabled = true;
+
+                fetch(API_URL)
+                    .then(function (resposta) {
+                        if (!resposta.ok) {
+                            throw new Error("Erro HTTP: " + resposta.status);
+                        }
+
+                        return resposta.json();
+                    })
+                    .then(function (dados) {
+                        const livros = Array.isArray(dados.docs) ? dados.docs : [];
+                        renderizarLivros(livros);
+                        atualizarStatus("Livros carregados com sucesso.");
+                    })
+                    .catch(function (erro) {
+                        console.error("Erro ao carregar livros:", erro);
+                        atualizarStatus("Erro ao carregar livros.");
+                    })
+                    .finally(function () {
+                        btnCarregar.disabled = false;
+                    });
+            }
+
+            function renderizarLivros(livros) {
+                if (!livros || livros.length === 0) {
+                    listaLivros.innerHTML = "<li>Nenhum livro encontrado.</li>";
+                    return;
+                }
+
+                listaLivros.innerHTML = livros
+                    .map(function (livro) {
+                        const titulo = livro.title || "Título desconhecido";
+                        const autor = livro.author || "Autor desconhecido";
+
+                        return "<li><strong>" + titulo + "</strong> — " + autor + "</li>";
+                    })
+                    .join("");
+            }
+
+            function atualizarStatus(mensagem) {
+                status.textContent = mensagem;
+            }
+
+            function limparLista() {
+                listaLivros.innerHTML = "";
+            }
+        })();
+        console.log(API_URL) // ReferenceError: API_URL is not defined
+    </script>
+</body>
+
+</html>

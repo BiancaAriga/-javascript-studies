@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prática — Lista de livros refatoração com jQuery</title>
+    <title>Prática — Lista de livros com Fetch API</title>
     <link rel="stylesheet" href="../estilos.css">
 </head>
 
@@ -12,21 +12,19 @@
     <main>
         <a class="voltar" href="../index.html">← Voltar ao índice</a>
 
-        <h1>Prática: lista de livros com jQuery</h1>
+        <h1>Prática: lista de livros com Fetch API</h1>
         <p class="subtitle">
-            Estrutura base para implementar sua requisição <code>$.ajax()</code>.
+            Estrutura base para você refatorar a requisição usando <code>fetch()</code>.
         </p>
 
         <section>
             <h2>O que você vai fazer</h2>
             <p>
-                Abstraia a requisição XHR usando jQuery — troque o código de XHR puro por 
-                <code>$.ajax()</code> ou <code>$.get()</code>.
+                Substitua a lógica de XHR ou jQuery por <code>fetch()</code> para recuperar livros de uma API e mostrar os resultados na tela.
             </p>
             <ul>
-                <li>use <code>$.get()</code> para requisições GET simples.</li>
-                <li>Use <code>$.ajax()</code> para mais controle sobre a requisição.</li>
-                <li>Trate sucesso e erro com callbacks ou Promises.</li>
+                <li>Use <code>fetch()</code> para fazer uma requisição <code>GET</code>.</li>
+                <li>Trate respostas OK e erros com <code>.then()</code> e <code>.catch()</code>.</li>
                 <li>Mostre um estado de carregamento enquanto a requisição está em andamento.</li>
             </ul>
         </section>
@@ -41,15 +39,14 @@
             <h2>Observações</h2>
             <p>
                 A API sugerida é
-                <code>https://openlibrary.org/search.json?q=romance&limit=15</code>.
-                Se preferir, use outra URL de API que retorne JSON.
+                <code>https://fakerapi.it/api/v1/books?_quantity=10</code>.
+                Se preferir, pode usar outra API que retorne JSON.
             </p>
         </section>
 
-        <footer>PDI Front — Prática 1: lista de livros com jQuery</footer>
+        <footer>PDI Front — Prática 3: lista de livros com Fetch API</footer>
     </main>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         const API_URL = "https://openlibrary.org/search.json?q=romance&limit=15";
         const btnCarregar = document.getElementById("btn-carregar");
@@ -63,20 +60,18 @@
             limparLista();
             btnCarregar.disabled = true;
 
-            $.ajax({
-                url: API_URL,
-                method: "GET",
-                dataType: "json",
-                success: function (livros) {
+            fetch(API_URL)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (livros) {
                     console.log(livros.docs);
                     renderizarLivros(livros.docs);
-                    atualizarStatus("Livros carregados com sucesso")
-                },
-                error: function (xhr, status, erro) {
-                    console.error("Erro:", status, erro);
-                    atualizarStatus("Erro ao carregar livros.");
-                }
-            });
+                    atualizarStatus("Livros carregados com sucesso");
+                })
+                .catch(function (erro) {
+                    console.error("Falha:", erro);
+                });
         }
 
         function renderizarLivros(livros) {
@@ -102,6 +97,7 @@
         function limparLista() {
             listaLivros.innerHTML = "";
         }
+        console.log(listaLivros)
     </script>
 </body>
 

@@ -94,12 +94,12 @@
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ccc;"><strong>PUT</strong></td>
-          <td style="padding: 8px; border: 1px solid #ccc;">Substituir um recurso completo (idempotente)</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Substitui o recurso <strong>inteiro</strong> pelos novos dados (idempotente)</td>
           <td style="padding: 8px; border: 1px solid #ccc;"><code>PUT /api/livros/42</code></td>
         </tr>
         <tr>
           <td style="padding: 8px; border: 1px solid #ccc;"><strong>PATCH</strong></td>
-          <td style="padding: 8px; border: 1px solid #ccc;">Atualizar parte de um recurso</td>
+          <td style="padding: 8px; border: 1px solid #ccc;">Atualiza <strong>apenas parte</strong> do recurso (atualização parcial)</td>
           <td style="padding: 8px; border: 1px solid #ccc;"><code>PATCH /api/livros/42</code></td>
         </tr>
         <tr>
@@ -110,7 +110,32 @@
       </table>
       <p>
         <strong>Idempotente</strong> significa que fazer a mesma requisição várias vezes
-        tem o mesmo efeito que fazer uma vez (GET, PUT, DELETE são idempotentes; POST não).
+        tem <strong>sempre o mesmo efeito</strong> que fazer uma única vez. É como apertar
+        um botão "pausar" — não importa quantas vezes você aperte, o resultado é o mesmo.
+      </p>
+      <h3>Exemplos práticos:</h3>
+      <ul>
+        <li>
+          <strong>GET /api/livros/42</strong> — Idempotente. Chamar 10 vezes retorna os mesmos dados.
+          Não muda nada no servidor.
+        </li>
+        <li>
+          <strong>DELETE /api/livros/42</strong> — Idempotente. Deleta na primeira vez. Se chamar
+          de novo, o livro já está deletado (você pode receber 404, mas o efeito é o mesmo: livro não existe).
+        </li>
+        <li>
+          <strong>PUT /api/livros/42</strong> — Idempotente. Substitui o livro pelos dados novos.
+          Chamar 5 vezes resulta no mesmo livro (não cria cópias, não duplica).
+        </li>
+        <li>
+          <strong>POST /api/livros</strong> — NÃO idempotente. Cria um livro novo cada vez.
+          Chamar 3 vezes = 3 livros criados! Perigoso se a requisição repetir por erro de rede.
+        </li>
+      </ul>
+      <p>
+        <strong>Por que isso importa?</strong> Se a conexão cai e a requisição é enviada
+        de novo automaticamente, com GET/PUT/DELETE você está seguro. Com POST, você pode
+        criar duplicatas sem querer.
       </p>
     </section>
 
