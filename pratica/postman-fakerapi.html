@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prática — Coleção Postman com DummyJSON</title>
+    <link rel="stylesheet" href="../estilos.css">
+</head>
+
+<body>
+    <main>
+        <a class="voltar" href="../index.html">← Voltar ao índice</a>
+
+        <h1>Prática: coleção Postman com DummyJSON</h1>
+        <p class="subtitle">
+            Exercícios para criar, organizar e validar requisições HTTP sem escrever código no navegador.
+        </p>
+
+        <section>
+            <h2>Objetivos</h2>
+            <ul>
+                <li>Criar uma coleção e um ambiente no Postman.</li>
+                <li>Simular requisições <code>GET</code> para diferentes recursos.</li>
+                <li>Usar parâmetros de consulta, variáveis e scripts de teste.</li>
+                <li>Investigar respostas de sucesso e de erro.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Preparação</h2>
+            <ol>
+                <li>Crie uma coleção chamada <strong>PDI — DummyJSON</strong>.</li>
+                <li>Crie um ambiente chamado <strong>DummyJSON - estudo</strong>.</li>
+                <li>Adicione a variável <code>base_url</code> com o valor <code>https://dummyjson.com</code>.</li>
+                <li>Salve todas as requisições dentro da coleção.</li>
+            </ol>
+            <div class="card">
+                <strong>Formato das respostas:</strong>
+                <p>Nas listas, a API retorna um objeto com uma coleção (<code>products</code>, <code>users</code> ou <code>posts</code>), além de <code>total</code>, <code>skip</code> e <code>limit</code>.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Exercícios</h2>
+
+            <h3>1. Listar produtos</h3>
+            <p>Crie uma requisição <code>GET</code> chamada <strong>Listar produtos</strong>:</p>
+            <pre><code>{{base_url}}/products?limit=5&amp;skip=0</code></pre>
+
+            <h3>2. Paginar e selecionar campos</h3>
+            <p>Duplique a requisição anterior e altere os parâmetros para buscar dez produtos a partir do décimo item:</p>
+            <pre><code>{{base_url}}/products?limit=10&amp;skip=10</code></pre>
+            <p>Depois, solicite apenas alguns campos e compare o tamanho das respostas:</p>
+            <pre><code>{{base_url}}/products?limit=5&amp;select=title,price,stock</code></pre>
+
+            <h3>3. Explorar outros recursos</h3>
+            <p>Crie uma pasta <strong>Recursos</strong> e adicione uma requisição para cada URL:</p>
+                <pre><code>GET {{base_url}}/users?limit=3
+GET {{base_url}}/posts?limit=3
+GET {{base_url}}/carts?limit=3
+GET {{base_url}}/todos?limit=3</code></pre>
+            <p>Para cada recurso, identifique o campo que funciona como identificador e anote o nome da coleção retornada.</p>
+
+            <h3>4. Buscar e ordenar produtos</h3>
+            <p>Use a busca por texto e compare o resultado com uma listagem ordenada por preço:</p>
+            <pre><code>{{base_url}}/products/search?q=phone
+{{base_url}}/products?sortBy=price&amp;order=asc&amp;limit=5</code></pre>
+            <p>Depois, altere <code>order</code> para <code>desc</code>. O que mudou na ordem dos produtos?</p>
+
+            <h3>5. Validar a resposta com um teste</h3>
+            <p>Na aba <strong>Tests</strong> da requisição de produtos, escreva um teste que verifique o status HTTP e o formato básico da resposta:</p>
+            <pre><code>pm.test("resposta HTTP bem-sucedida", function () {
+    pm.response.to.have.status(200);
+});
+
+pm.test("resposta possui uma lista de dados", function () {
+    const corpo = pm.response.json();
+    pm.expect(corpo.products).to.be.an("array");
+    pm.expect(corpo.products.length).to.be.above(0);
+});</code></pre>
+            <p>Execute a requisição e observe os resultados na aba <strong>Test Results</strong>.</p>
+
+            <h3>6. Criar uma variável a partir da resposta</h3>
+            <p>Na aba <strong>Tests</strong>, salve o identificador do primeiro produto em uma variável de coleção:</p>
+            <pre><code>const corpo = pm.response.json();
+pm.collectionVariables.set("primeiro_produto", corpo.products[0].id);
+
+pm.test("primeiro produto possui identificador", function () {
+    pm.expect(corpo.products[0].id).to.exist;
+});</code></pre>
+            <p>Depois, consulte o produto com <code>{{base_url}}/products/{{primeiro_produto}}</code>.</p>
+
+            <h3>7. Investigar erros</h3>
+            <p>Crie uma pasta <strong>Erros esperados</strong> e execute estas chamadas:</p>
+            <pre><code>GET {{base_url}}/recurso-que-nao-existe
+GET {{base_url}}/products/999999</code></pre>
+            <p>Registre o status, o corpo da resposta e a mensagem de erro. Explique por que o Postman continua conseguindo enviar a requisição mesmo quando a API responde com erro.</p>
+        </section>
+
+        <section>
+            <h2>Desafio final</h2>
+            <p>Execute a coleção pelo <strong>Collection Runner</strong> e confira o resumo de testes aprovados e falhos.</p>
+        </section>
+
+        <section>
+            <h2>Referência rápida</h2>
+            <ul>
+                <li><code>limit</code>: quantidade máxima de registros solicitados.</li>
+                <li><code>skip</code>: quantidade de registros ignorados antes do resultado.</li>
+                <li><code>select</code>: campos que devem ser incluídos na resposta.</li>
+                <li><code>products</code>: array de produtos retornados.</li>
+            </ul>
+            <p>Documentação: <a href="https://dummyjson.com/docs" target="_blank" rel="noopener noreferrer">DummyJSON</a>.</p>
+        </section>
+
+        <footer>PDI Front — Prática 8: coleções no Postman</footer>
+    </main>
+</body>
+
+</html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prática — CRUD com Session Storage</title>
+    <title>Prática — CRUD com Local Storage</title>
     <link rel="stylesheet" href="../estilos.css">
 </head>
 
@@ -12,22 +12,22 @@
     <main>
         <a class="voltar" href="../index.html">← Voltar ao índice</a>
 
-        <h1>Prática: CRUD com Session Storage</h1>
+        <h1>Prática: CRUD com Local Storage</h1>
         <p class="subtitle">
-            Estrutura base para praticar persistência de dados na sessão do navegador.
+            Estrutura base para praticar persistência de dados no navegador.
         </p>
 
         <section>
             <h2>O que você vai fazer</h2>
             <p>
-                A ideia desta prática é persistir uma lista de livros na sessão do navegador,
-                usando <code>sessionStorage</code> para armazenar, listar, atualizar e excluir itens.
+                A ideia desta prática é persistir uma lista de livros no navegador,
+                usando <code>localStorage</code> para armazenar, listar, atualizar e excluir itens.
             </p>
             <ul>
                 <li>Carregue livros da API ou use uma lista inicial.</li>
-                <li>Salve os dados no <code>sessionStorage</code>.</li>
+                <li>Salve os dados no <code>localStorage</code>.</li>
                 <li>Crie operações de leitura, atualização e exclusão.</li>
-                <li>Mostre o estado da aplicação em tela.</li>
+                <li>Observe que os dados continuam disponíveis após fechar o navegador.</li>
             </ul>
         </section>
 
@@ -36,19 +36,19 @@
             <button type="button" id="btn-atualizar">Atualizar livros</button>
             <button type="button" id="btn-excluir">Excluir livros</button>
             <p id="status">Clique em carregar para buscar os livros.</p>
-            
+
             <ul id="lista-livros" class="lista-livros"></ul>
         </section>
 
         <section>
             <h2>Observações</h2>
             <p>
-                Você pode usar uma API para buscar os livros e depois salvar no <code>sessionStorage</code>.
-                Também pode começar com uma lista local e evoluir a lógica.
+                Você pode usar uma API para buscar os livros e depois salvar no <code>localStorage</code>.
+                Compare o comportamento desta prática com o <code>sessionStorage</code> da Etapa 6.
             </p>
         </section>
 
-        <footer>PDI Front — Prática 6: CRUD com Session Storage</footer>
+        <footer>PDI Front — Prática 7: CRUD com Local Storage</footer>
     </main>
 
     <script>
@@ -61,6 +61,8 @@
             const listaLivros = document.getElementById("lista-livros");
 
             btnCarregar.addEventListener("click", carregarLivros);
+            btnAtualizar.addEventListener("click", atualizarLivros);
+            btnExcluir.addEventListener("click", excluirLivros);
 
             function carregarLivros() {
                 atualizarStatus("Carregando livros...");
@@ -81,9 +83,8 @@
                             title: livro.title,
                             author: livro.author_name?.[0]
                         }));
-                        sessionStorage.setItem('livros', JSON.stringify(livrosSimplificados));
-                        const sessionStorageItem = sessionStorage.getItem('livros');
-                        renderizarLivros(JSON.parse(sessionStorageItem));
+                        localStorage.setItem("livros", JSON.stringify(livrosSimplificados));
+                        renderizarLivros(JSON.parse(localStorage.getItem("livros")));
                         atualizarStatus("Livros carregados com sucesso.");
                     })
                     .catch(function (erro) {
@@ -111,8 +112,6 @@
                     .join("");
             }
 
-            btnAtualizar.addEventListener("click", atualizarLivros);
-
             function atualizarLivros() {
                 atualizarStatus("Atualizando livros...");
                 limparLista();
@@ -122,21 +121,16 @@
                     { title: "Livro Atualizado 2", author: "Autor Atualizado 2" },
                     { title: "Livro Atualizado 3", author: "Autor Atualizado 3" }
                 ];
-                sessionStorage.setItem('livros', JSON.stringify(livrosAtualizados));
-                const sessionStorageItem = sessionStorage.getItem('livros');
-                renderizarLivros(JSON.parse(sessionStorageItem));
+                localStorage.setItem("livros", JSON.stringify(livrosAtualizados));
+                renderizarLivros(JSON.parse(localStorage.getItem("livros")));
                 atualizarStatus("Livros atualizados com sucesso.");
             }
-
-            btnExcluir.addEventListener("click", excluirLivros);
 
             function excluirLivros() {
                 atualizarStatus("Excluindo livros...");
                 limparLista();
-                sessionStorage.removeItem('livros');
-                sessionStorage.clear();
-                const sessionStorageItem = sessionStorage.getItem('livros');
-                renderizarLivros(JSON.parse(sessionStorageItem));
+                localStorage.removeItem("livros");
+                renderizarLivros(JSON.parse(localStorage.getItem("livros")));
                 atualizarStatus("Livros removidos com sucesso.");
             }
 
